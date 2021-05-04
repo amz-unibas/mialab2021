@@ -1,11 +1,7 @@
 import os
-import torch
 import nibabel as nib
-from PIL import Image
 from torch.utils import data
 import numpy as np
-import pathlib
-import matplotlib.pyplot as plt
 
 
 class DataSet(data.Dataset):

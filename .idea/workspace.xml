@@ -2,13 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4ac1a4fa-5276-402d-9327-3f748c9c75f9" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset_v1.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/dataset.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -213,7 +208,8 @@
       <workItem from="1618993800913" duration="9429000" />
       <workItem from="1619586355483" duration="5932000" />
       <workItem from="1619602894957" duration="5708000" />
-      <workItem from="1620132489984" duration="565000" />
+      <workItem from="1620132489984" duration="1180000" />
+      <workItem from="1620133942847" duration="31000" />
     </task>
     <servers />
   </component>
@@ -309,11 +305,14 @@
     <state width="1878" height="402" key="GridCell.Tab.1.right/1680.-125.1920.1175/0.25.1680.945@1680.-125.1920.1175" timestamp="1619604781448" />
     <state width="1692" height="215" key="GridCell.Tab.1.right/1680.-125.1920.1175/0.25.1680.946@1680.-125.1920.1175" timestamp="1618413636413" />
     <state width="1017" height="342" key="GridCell.Tab.1.right/1680.-125.1920.1175/0.25.1680.947@1680.-125.1920.1175" timestamp="1617786902824" />
-    <state x="2119" y="-29" width="997" height="728" key="SettingsEditor" timestamp="1619609560924">
-      <screen x="1680" y="-125" width="1920" height="1175" />
+    <state x="384" y="103" width="977" height="728" key="SettingsEditor" timestamp="1620133823474">
+      <screen x="0" y="25" width="1680" height="947" />
     </state>
+    <state x="384" y="109" width="900" height="728" key="SettingsEditor/1680.-125.1920.1092/0.25.1680.1025@0.25.1680.1025" timestamp="1620133402928" />
     <state x="2119" y="-29" width="997" height="728" key="SettingsEditor/1680.-125.1920.1175/0.25.1680.942@1680.-125.1920.1175" timestamp="1619609560924" />
     <state x="2281" y="-62" key="SettingsEditor/1680.-125.1920.1175/0.25.1680.946@1680.-125.1920.1175" timestamp="1618317023983" />
+    <state x="384" y="103" width="977" height="728" key="SettingsEditor/1680.-125.1920.1175/0.25.1680.947@0.25.1680.947" timestamp="1620133823474" />
+    <state x="384" y="103" width="977" height="728" key="SettingsEditor/1680.-125.1920.1175/0.25.1680.949@0.25.1680.949" timestamp="1620133769173" />
     <state x="551" y="131" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1617718736668">
       <screen x="0" y="25" width="1680" height="946" />
     </state>
