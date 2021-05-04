@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="4ac1a4fa-5276-402d-9327-3f748c9c75f9" name="Default Changelist" comment="" />
+    <list default="true" id="4ac1a4fa-5276-402d-9327-3f748c9c75f9" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataset_v1.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -28,6 +36,9 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="ProjectId" id="1psxRwEua6z0RCaExWKWGhFAMa0" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -36,8 +47,9 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/data/test/images" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -151,6 +163,9 @@
       <module name="Mia_Code" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
@@ -198,6 +213,7 @@
       <workItem from="1618993800913" duration="9429000" />
       <workItem from="1619586355483" duration="5932000" />
       <workItem from="1619602894957" duration="5708000" />
+      <workItem from="1620132489984" duration="565000" />
     </task>
     <servers />
   </component>
@@ -209,6 +225,10 @@
       <screen x="1680" y="-125" width="1920" height="1175" />
     </state>
     <state x="2207" y="230" key="#com.intellij.fileTypes.FileTypeChooser/1680.-125.1920.1175/0.25.1680.946@1680.-125.1920.1175" timestamp="1618398794270" />
+    <state x="372" y="226" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1620132849432">
+      <screen x="0" y="25" width="1680" height="949" />
+    </state>
+    <state x="372" y="226" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/1680.-125.1920.1175/0.25.1680.949@0.25.1680.949" timestamp="1620132849432" />
     <state width="1878" height="408" key="GridCell.Tab.0.bottom" timestamp="1619624851527">
       <screen x="0" y="25" width="1680" height="942" />
     </state>
@@ -311,11 +331,6 @@
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/train_old.py</url>
           <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/model.py</url>
-          <line>16</line>
-          <option name="timeStamp" value="32" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>

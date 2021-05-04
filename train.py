@@ -19,9 +19,9 @@ from utils import (
 
 # Hyperparameters
 
-
+GPU_ID = 2
 LEARNING_RATE = 1e-4
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+DEVICE = "cuda:" + str(GPU_ID) if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 8
 NUM_EPOCHS = 3
 NUM_WORKERS = 2

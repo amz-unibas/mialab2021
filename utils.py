@@ -59,7 +59,7 @@ def get_loaders(
     return train_loader, test_loader
 
 
-def check_accuracy(loader, model, device="cuda"):
+def check_accuracy(loader, model, device="cuda:2"):
     num_correct = 0
     num_pixels = 0
     dice_score = 0
@@ -85,7 +85,7 @@ def check_accuracy(loader, model, device="cuda"):
 
 
 def save_predictions_as_imgs(
-        loader, model, folder="saved_images/", device="cuda"
+        loader, model, folder="saved_images/", device="cuda:2"
 ):
     model.eval()
     for idx, (x, y) in enumerate(loader):
