@@ -35,7 +35,7 @@ class DataSet(data.Dataset):
         if img.ndim > 3:
             ##check which image is the correct one since there are 2
             img = img[:, :, :, 0]
-            print("Adjusted dimensions: ", img.shape)
+            # print("Adjusted dimensions: ", img.shape)
 
         ##add padding
         pad_img = np.zeros((self.img_width, self.img_height, 1))
@@ -52,7 +52,7 @@ class DataSet(data.Dataset):
             pad_img = augmentations["image"]
             pad_label = augmentations["mask"]
 
-        print("Shape img", pad_img.shape)
-        print("Shape label", pad_label.shape)
+        # print("Shape img", pad_img.shape)
+        # print("Shape label", pad_label.shape)
 
         return pad_img, pad_label
