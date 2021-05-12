@@ -43,7 +43,7 @@ class DataSet(data.Dataset):
         pad_label = np.zeros((self.img_width, self.img_height))
         pad_label[:label.shape[0], :label.shape[1]] = label
 
-        # adjust to NCHW format
+        # adjust to NCHW format --> use ToTensorV2 (in train.py)
         # pad_img = pad_img.transpose(2, 1, 0)
         # pad_label = pad_label.transpose(2, 1, 0)
 
@@ -51,6 +51,12 @@ class DataSet(data.Dataset):
             augmentations = self.transform(image=pad_img, mask=pad_label)
             pad_img = augmentations["image"]
             pad_label = augmentations["mask"]
+
+            # plt.imshow(pad_img)
+            # plt.show()
+            # plt.imshow(pad_label)
+            # plt.show()
+            # print("print")
 
         # print("Shape img", pad_img.shape)
         # print("Shape label", pad_label.shape)
