@@ -42,7 +42,7 @@ TEST_LABEL_DIR = "data/test/labels/"
 current_date = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
 
 result_path = os.path.join("/results", current_date)
-writer = SummaryWriter(result_path)
+writer = SummaryWriter()
 
 
 def train_fn(loader, model, optimizer, loss_fn, scaler, idx):
