@@ -10,6 +10,7 @@ from model import UNET
 from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
 import os
+import time
 
 
 from utils import (
@@ -140,6 +141,8 @@ def main():
             test_loader, model, folder="saved_images/", device=DEVICE
         )
         writer.flush()
+        # use sleep to show the training
+        time.sleep(0.2)
 
     writer.close()
 

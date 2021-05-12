@@ -2,11 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4ac1a4fa-5276-402d-9327-3f748c9c75f9" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/circle_detection.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/testimg.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/testtransform.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/dataset.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -241,7 +237,7 @@
       <workItem from="1620141481080" duration="16000" />
       <workItem from="1620141568271" duration="2137000" />
       <workItem from="1620204338625" duration="11013000" />
-      <workItem from="1620800895186" duration="2645000" />
+      <workItem from="1620800895186" duration="2808000" />
     </task>
     <servers />
   </component>
