@@ -16,7 +16,7 @@ from utils import (
     save_checkpoint,
     get_loaders,
     check_accuracy,
-    save_predictions_as_imgs,
+    save_predictions_as_imgs
 )
 
 # Hyperparameters
@@ -63,13 +63,13 @@ def train_fn(loader, model, optimizer, loss_fn, scaler, idx):
         # update tqdm loop
         loop.set_postfix(loss=loss.item())
 
-        # tensorboard
-        writer.add_scalar('loss ', loss.item(), idx)
-
-        if idx % 10 == 0:
-            writer.add_images("input images", data.detach().cpu(), idx)
-            writer.add_images("target labels", targets.detach().cpu(), idx)
-            writer.add_images("estimated labels", torch.sigmoid(predictions.detach()).cpu(), idx)
+        # # tensorboard
+        # writer.add_scalar('loss ', loss.item(), idx)
+        #
+        # if idx % 10 == 0:
+        #     writer.add_images("input images", data.detach().cpu(), idx)
+        #     writer.add_images("target labels", targets.detach().cpu(), idx)
+        #     writer.add_images("estimated labels", torch.sigmoid(predictions.detach()).cpu(), idx)
 
 def main():
     train_transform = albu.Compose(
@@ -79,7 +79,7 @@ def main():
             #albu.HorizontalFlip(p=0.5),
             albu.VerticalFlip(p=0.5),
             albu.Blur(blur_limit=5, always_apply=False, p=0.5),
-            albu.RandomBrightnessContrast(brightness_limit=0.1, contrast_limit=0.1, brightness_by_max=True, always_apply=False, p=0.5),
+            #albu.RandomBrightnessContrast(brightness_limit=0.1, contrast_limit=0.1, brightness_by_max=True, always_apply=False, p=0.5),
             albu.Normalize(mean=0, std=1),
             ToTensorV2(),
         ],
@@ -132,7 +132,7 @@ def main():
 
         if idx % 5 == 0:
             # check accuracy
-            check_accuracy(test_loader, model, device=DEVICE)
+            check_accuracy(test_loader, model, writer, loss_fn, device=DEVICE)
             # print some examples to a folder
             save_predictions_as_imgs(test_loader, model, index=idx, folder="saved_images/", device=DEVICE)
 

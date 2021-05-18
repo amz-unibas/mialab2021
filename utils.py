@@ -63,29 +63,26 @@ def get_loaders(
     return train_loader, test_loader
 
 
-def check_accuracy(loader, model, device="cuda:2"):
-    num_correct = 0
-    num_pixels = 0
+def check_accuracy(loader, model, writer, loss_fn, device="cuda:2"):
     dice_score = 0
     model.eval()
 
     with torch.no_grad():
-        for x, y in loader:
+        for idx, (x, y) in loader:
             x = x.to(device)
             y = y.to(device)
+            targets = y.float().unsqueeze(1).to(device)
             preds = torch.sigmoid(model(x))
+            loss = loss_fn(preds, targets)
             # convert all values > 0.5 to 1
             preds = (preds > 0.5).float()
-            # num_correct += (preds == y).sum()
-            # num_pixels += torch.numel(preds)
-            # dice_score += (2 * (preds * y).sum()) / (
-            #         (preds + y).sum() + 1e-8
-            # )
             dice_score += calculate_dice_score(y, preds)
-    #
-    # print(
-    #     f"Got {num_correct}/{num_pixels} with acc {num_correct / num_pixels * 100:.2f}"
-    # )
+            # tensorboard
+            writer.add_scalar('loss ', loss.item(), idx)
+            writer.add_images("input images", x.detach().cpu(), idx)
+            writer.add_images("target labels", y.detach().cpu(), idx)
+            writer.add_images("estimated labels", preds.detach().cpu(), idx)
+
     print(f"Dice score: {dice_score / len(loader)}")
     model.train()
 

@@ -49,6 +49,7 @@ class DataSet(data.Dataset):
         # pad_label = pad_label.transpose(2, 1, 0)
 
         if self.transform is not None:
+            print("Img name: ", img_path)
             augmentations = self.transform(image=pad_img, mask=pad_label)
             pad_img = augmentations["image"]
             pad_label = augmentations["mask"]
@@ -57,8 +58,6 @@ class DataSet(data.Dataset):
         # plt.show()
         # plt.imshow(label)
         # plt.show()
-        # print("Test")
-
         # print("Shape img", pad_img.shape)
         # print("Shape label", pad_label.shape)
 
