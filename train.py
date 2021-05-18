@@ -63,13 +63,8 @@ def train_fn(loader, model, optimizer, loss_fn, scaler, idx):
         # update tqdm loop
         loop.set_postfix(loss=loss.item())
 
-        # # tensorboard
-        # writer.add_scalar('loss ', loss.item(), idx)
-        #
-        # if idx % 10 == 0:
-        #     writer.add_images("input images", data.detach().cpu(), idx)
-        #     writer.add_images("target labels", targets.detach().cpu(), idx)
-        #     writer.add_images("estimated labels", torch.sigmoid(predictions.detach()).cpu(), idx)
+        # tensorboard
+        writer.add_scalar('loss ', loss.item(), idx)
 
 def main():
     train_transform = albu.Compose(
