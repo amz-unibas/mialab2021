@@ -39,17 +39,17 @@ class DataSet(data.Dataset):
             # print("Adjusted dimensions: ", img.shape)
 
         ##add padding
-        pad_img = np.zeros((self.img_width, self.img_height, 1))
-        pad_img[:img.shape[0], :img.shape[1], :img.shape[2]] = img
-        pad_label = np.zeros((self.img_width, self.img_height))
-        pad_label[:label.shape[0], :label.shape[1]] = label
+        # pad_img = np.zeros((self.img_width, self.img_height, 1))
+        # pad_img[:img.shape[0], :img.shape[1], :img.shape[2]] = img
+        # pad_label = np.zeros((self.img_width, self.img_height))
+        # pad_label[:label.shape[0], :label.shape[1]] = label
 
         # adjust to NCHW format --> use ToTensorV2 (in train.py)
         # pad_img = pad_img.transpose(2, 1, 0)
         # pad_label = pad_label.transpose(2, 1, 0)
 
         if self.transform is not None:
-            augmentations = self.transform(image=pad_img, mask=pad_label)
+            augmentations = self.transform(image=img, mask=label)
             pad_img = augmentations["image"]
             pad_label = augmentations["mask"]
 

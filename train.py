@@ -8,8 +8,6 @@ import torch.nn as nn
 import torch.optim as optim
 from model import UNET
 from torch.utils.tensorboard import SummaryWriter
-from datetime import datetime
-import os
 import time
 
 
@@ -28,7 +26,7 @@ LEARNING_RATE = 1e-4
 DEVICE = "cuda:" + str(GPU_ID) if torch.cuda.is_available() else "cpu"
 BATCH_SIZE = 32
 NUM_EPOCHS = 100
-NUM_WORKERS = 2
+NUM_WORKERS = 5
 IMAGE_HEIGHT = 300
 IMAGE_WIDTH = 340
 PAD_HEIGHT = 3000
@@ -39,14 +37,12 @@ TRAIN_IMG_DIR = "data/train/images/"
 TRAIN_LABEL_DIR = "data/train/labels/"
 TEST_IMG_DIR = "data/test/images/"
 TEST_LABEL_DIR = "data/test/labels/"
-current_date = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
 
-result_path = os.path.join("/results", current_date)
 writer = SummaryWriter()
 
 
 def train_fn(loader, model, optimizer, loss_fn, scaler, idx):
-    #progress bar
+    # progress bar
     loop = tqdm(loader)
 
     for batch_idx, (data, targets) in enumerate(loop):
@@ -68,21 +64,22 @@ def train_fn(loader, model, optimizer, loss_fn, scaler, idx):
         loop.set_postfix(loss=loss.item())
 
         # tensorboard
-        writer.add_scalar('cross entropy loss ', loss.item(), idx)
+        writer.add_scalar('loss ', loss.item(), idx)
 
-        if idx % 25 == 0:
-            writer.add_images("input images", targets.detach().cpu(), idx)
-            writer.add_images("estimated labels", predictions, idx)
-
-
+        if idx % 10 == 0:
+            writer.add_images("input images", data.detach().cpu(), idx)
+            writer.add_images("target labels", targets.detach().cpu(), idx)
+            writer.add_images("estimated labels", torch.sigmoid(predictions.detach()).cpu(), idx)
 
 def main():
     train_transform = albu.Compose(
         [
             albu.Resize(height=IMAGE_HEIGHT, width=IMAGE_WIDTH),
             albu.Rotate(limit=10, p=0.5),
-            albu.HorizontalFlip(p=0.5),
-            albu.VerticalFlip(p=0.1),
+            #albu.HorizontalFlip(p=0.5),
+            albu.VerticalFlip(p=0.5),
+            albu.Blur(blur_limit=5, always_apply=False, p=0.5),
+            albu.RandomBrightnessContrast(brightness_limit=0.1, contrast_limit=0.1, brightness_by_max=True, always_apply=False, p=0.5),
             albu.Normalize(mean=0, std=1),
             ToTensorV2(),
         ],
@@ -117,7 +114,7 @@ def main():
     )
 
     if LOAD_MODEL:
-        load_checkpoint(torch.load("my_checkpoint.pth.tar"), model)
+        load_checkpoint(torch.load("checkpoint.pth.tar"), model)
 
     check_accuracy(test_loader, model, device=DEVICE)
     scaler = torch.cuda.amp.GradScaler()
@@ -133,13 +130,12 @@ def main():
         }
         save_checkpoint(checkpoint)
 
-        # check accuracy
-        check_accuracy(test_loader, model, device=DEVICE)
+        if idx % 5 == 0:
+            # check accuracy
+            check_accuracy(test_loader, model, device=DEVICE)
+            # print some examples to a folder
+            save_predictions_as_imgs(test_loader, model, index=idx, folder="saved_images/", device=DEVICE)
 
-        # print some examples to a folder
-        save_predictions_as_imgs(
-            test_loader, model, folder="saved_images/", device=DEVICE
-        )
         writer.flush()
         # use sleep to show the training
         time.sleep(0.2)
