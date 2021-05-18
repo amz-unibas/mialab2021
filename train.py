@@ -24,7 +24,7 @@ from utils import (
 GPU_ID = 2
 LEARNING_RATE = 1e-4
 DEVICE = "cuda:" + str(GPU_ID) if torch.cuda.is_available() else "cpu"
-BATCH_SIZE = 32
+BATCH_SIZE = 24
 NUM_EPOCHS = 100
 NUM_WORKERS = 5
 IMAGE_HEIGHT = 300

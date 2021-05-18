@@ -50,16 +50,16 @@ class DataSet(data.Dataset):
 
         if self.transform is not None:
             augmentations = self.transform(image=img, mask=label)
-            pad_img = augmentations["image"]
-            pad_label = augmentations["mask"]
+            img = augmentations["image"]
+            label = augmentations["mask"]
 
-            # plt.imshow(pad_img)
+            # plt.imshow(img)
             # plt.show()
-            # plt.imshow(pad_label)
+            # plt.imshow(label)
             # plt.show()
             # print("print")
 
         # print("Shape img", pad_img.shape)
         # print("Shape label", pad_label.shape)
 
-        return pad_img, pad_label
+        return img, label

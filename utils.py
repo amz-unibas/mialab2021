@@ -89,12 +89,12 @@ def check_accuracy(loader, model, device="cuda:2"):
     print(f"Dice score: {dice_score / len(loader)}")
     model.train()
 
-
+##TODO correct implementation, seems like torch.sum(y) == 0 and torch.sum(preds) == 0 is often the case?
 def calculate_dice_score(y, preds):
-    intersection = np.sum(y * preds)
-    if np.sum(y) == 0 & np.sum(preds) == 0:
+    intersection = torch.sum(preds * y)
+    if torch.sum(y) == 0 and torch.sum(preds) == 0:
         return 1
-    return (2 * intersection) / (np.sum(y) + np.sum(preds))
+    return 2 * intersection / (torch.sum(preds) + torch.sum(y))
 
 
 def save_predictions_as_imgs(loader, model, index, folder="saved_images/", device="cuda:2"):
