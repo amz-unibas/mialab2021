@@ -53,11 +53,11 @@ class DataSet(data.Dataset):
             img = augmentations["image"]
             label = augmentations["mask"]
 
-            # plt.imshow(img)
-            # plt.show()
-            # plt.imshow(label)
-            # plt.show()
-            # print("print")
+        # plt.imshow(img)
+        # plt.show()
+        # plt.imshow(label)
+        # plt.show()
+        # print("print")
 
         # print("Shape img", pad_img.shape)
         # print("Shape label", pad_label.shape)
