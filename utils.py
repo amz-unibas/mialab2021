@@ -85,7 +85,7 @@ def check_accuracy(loader, model, writer, loss_fn, device="cuda:2"):
         # tensorboard
         writer.add_scalar('loss ', loss.item(), idx)
         writer.add_images("input images", x.detach().cpu(), idx)
-        writer.add_images("target labels", y.detach().cpu(), idx)
+        writer.add_images("target labels", targets.detach().cpu(), idx)
         writer.add_images("estimated labels", preds.detach().cpu(), idx)
 
     model.train()
