@@ -74,8 +74,9 @@ def main():
             #albu.HorizontalFlip(p=0.5),
             albu.VerticalFlip(p=0.5),
             albu.Blur(blur_limit=5, always_apply=False, p=0.5),
+            #TODO label is float64, should be float32 to work for the brightness/contrast
             #albu.RandomBrightnessContrast(brightness_limit=0.1, contrast_limit=0.1, brightness_by_max=True, always_apply=False, p=0.5),
-            albu.Normalize(mean=0, std=1),
+            #albu.Normalize(mean=0, std=1),
             ToTensorV2(),
         ],
     )
@@ -83,7 +84,7 @@ def main():
     test_transforms = albu.Compose(
         [
             albu.Resize(height=IMAGE_HEIGHT, width=IMAGE_WIDTH),
-            albu.Normalize(mean=0, std=1),
+            #albu.Normalize(mean=0, std=1, max_pixel_value=1),
             ToTensorV2(),
         ],
     )
@@ -134,6 +135,17 @@ def main():
         writer.flush()
         # use sleep to show the training
         time.sleep(0.2)
+
+    #TODO: evaluate test images without labels for it
+    # for x in evaluateloader:
+    #     predications = torch.sigmoid(model(x))
+    #     predications = (predications > 0.5)
+
+    ##TODO resize to original size
+
+    ##TODO save as nifit.gz
+
+
 
     writer.close()
 

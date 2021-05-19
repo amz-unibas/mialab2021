@@ -66,6 +66,7 @@ def get_loaders(
 def check_accuracy(loader, model, writer, loss_fn, device="cuda:2"):
     dice_score = 0
     model.eval()
+    #no gradients
     with torch.no_grad():
         for x, y in loader:
             x = x.to(device)
@@ -73,6 +74,7 @@ def check_accuracy(loader, model, writer, loss_fn, device="cuda:2"):
             preds = torch.sigmoid(model(x))
             # convert all values > 0.5 to 1
             preds = (preds > 0.5).float()
+            #TODO dice score for each image, not in total
             dice_score += calculate_dice_score(y, preds)
 
     print(f"Dice score: {dice_score / len(loader)}")
@@ -82,13 +84,14 @@ def check_accuracy(loader, model, writer, loss_fn, device="cuda:2"):
         targets = y.float().unsqueeze(1).to(device)
         preds = torch.sigmoid(model(x))
         # tensorboard
+        ##TODO image back normalization (+min, /max)
         writer.add_images("input images", x.detach().cpu(), idx)
         writer.add_images("target labels", targets.detach().cpu(), idx)
         writer.add_images("estimated labels", preds.detach().cpu(), idx)
 
     model.train()
 
-##TODO correct implementation, seems like torch.sum(y) == 0 and torch.sum(preds) == 0 is often the case?
+##TODO check implementation, seems like torch.sum(y) == 0 and torch.sum(preds) == 0 is often the case?
 def calculate_dice_score(y, preds):
     intersection = torch.sum(preds * y)
     if torch.sum(y) == 0 and torch.sum(preds) == 0:

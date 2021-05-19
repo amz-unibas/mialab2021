@@ -3,7 +3,9 @@ import nibabel as nib
 from torch.utils import data
 import numpy as np
 import matplotlib.pyplot as plt
-
+import scipy.stats as ss
+import albumentations as albu
+import statistics
 
 class DataSet(data.Dataset):
     def __init__(self,
@@ -38,11 +40,31 @@ class DataSet(data.Dataset):
             img = img[:, :, :, 0]
             # print("Adjusted dimensions: ", img.shape)
 
+        ##z-normalization
+        # img_norm = (img - np.mean(img, dtype=np.float64)) / np.std(img, dtype=np.float64)
+        # label_norm = (label - np.mean(label, dtype=np.float64)) / np.std(label, dtype=np.float64)
+
+        ##albu Normalization
+        # normalize_transform = albu.Compose(
+        #     [
+        #         albu.Normalize(mean=0, std=1, max_pixel_value=1000)
+        #     ]
+        # )
+        # img_d = normalize_transform(image=img, mask=label)
+        # img_norm = img_d["image"]
+        # label_norm = img_d["mask"]
+
+        ##min/max-normalization
+        img_norm = (img - np.min(img))/(np.max(img)-np.min(img))
+        label_norm = (label - np.min(label))/(np.max(img) - np.min(img))
+
+
+        ##TODO: maybe padd with mean value of the image
         ##add padding
         pad_img = np.zeros((self.img_width, self.img_height, 1))
-        pad_img[:img.shape[0], :img.shape[1], :img.shape[2]] = img
+        pad_img[:img.shape[0], :img.shape[1], :img.shape[2]] = img_norm
         pad_label = np.zeros((self.img_width, self.img_height))
-        pad_label[:label.shape[0], :label.shape[1]] = label
+        pad_label[:label.shape[0], :label.shape[1]] = label_norm
 
         # adjust to NCHW format --> use ToTensorV2 (in train.py)
         # pad_img = pad_img.transpose(2, 1, 0)
