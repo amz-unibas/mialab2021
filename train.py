@@ -76,7 +76,6 @@ def main():
             albu.Blur(blur_limit=5, always_apply=False, p=0.5),
             #TODO label is float64, should be float32 to work for the brightness/contrast
             #albu.RandomBrightnessContrast(brightness_limit=0.1, contrast_limit=0.1, brightness_by_max=True, always_apply=False, p=0.5),
-            #albu.Normalize(mean=0, std=1),
             ToTensorV2(),
         ],
     )
@@ -84,7 +83,6 @@ def main():
     test_transforms = albu.Compose(
         [
             albu.Resize(height=IMAGE_HEIGHT, width=IMAGE_WIDTH),
-            #albu.Normalize(mean=0, std=1, max_pixel_value=1),
             ToTensorV2(),
         ],
     )

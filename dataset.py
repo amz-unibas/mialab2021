@@ -3,9 +3,7 @@ import nibabel as nib
 from torch.utils import data
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.stats as ss
 import albumentations as albu
-import statistics
 
 class DataSet(data.Dataset):
     def __init__(self,

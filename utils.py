@@ -71,7 +71,7 @@ def check_accuracy(loader, model, writer, loss_fn, device="cuda:2"):
         for x, y in loader:
             x = x.to(device)
             y = y.to(device)
-            preds = torch.sigmoid(model(x))
+            preds = torch.sigmoid(model(x.float()))
             # convert all values > 0.5 to 1
             preds = (preds > 0.5).float()
             #TODO dice score for each image, not in total
@@ -82,7 +82,7 @@ def check_accuracy(loader, model, writer, loss_fn, device="cuda:2"):
     for idx, (x, y) in enumerate(loader):
         x = x.to(device)
         targets = y.float().unsqueeze(1).to(device)
-        preds = torch.sigmoid(model(x))
+        preds = torch.sigmoid(model(x.float()))
         # tensorboard
         ##TODO image back normalization (+min, /max)
         writer.add_images("input images", x.detach().cpu(), idx)
