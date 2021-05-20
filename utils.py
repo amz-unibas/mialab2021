@@ -104,7 +104,7 @@ def save_predictions_as_imgs(loader, model, index, folder="saved_images/", devic
     for idx, (x, y) in enumerate(loader):
         x = x.to(device=device)
         with torch.no_grad():
-            preds = torch.sigmoid(model(x))
+            preds = torch.sigmoid(model(x.float()))
             preds = (preds > 0.5).float()
         torchvision.utils.save_image(preds, f"{folder}pred_{index}.png")
         torchvision.utils.save_image(y.unsqueeze(1), f"{folder}{index}.png")
