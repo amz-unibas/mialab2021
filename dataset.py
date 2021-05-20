@@ -45,18 +45,18 @@ class DataSet(data.Dataset):
         # label_norm = (label - np.mean(label, dtype=np.float64)) / np.std(label, dtype=np.float64)
 
         ##albu Normalization
-        # normalize_transform = albu.Compose(
-        #     [
-        #         albu.Normalize(mean=0, std=1, max_pixel_value=1000)
-        #     ]
-        # )
-        # img_d = normalize_transform(image=img, mask=label)
-        # img_norm = img_d["image"]
-        # label_norm = img_d["mask"]
+        normalize_transform = albu.Compose(
+            [
+                albu.Normalize(mean=0, std=1, max_pixel_value=np.amax(img))
+            ]
+        )
+        img_d = normalize_transform(image=img, mask=label)
+        img_norm = img_d["image"]
+        label_norm = img_d["mask"]
 
         ##min/max-normalization
-        img_norm = (img - np.min(img))/(np.max(img)-np.min(img))
-        label_norm = (label - np.min(label))/(np.max(img) - np.min(img))
+        # img_norm = (img - np.min(img))/(np.max(img)-np.min(img))
+        # label_norm = (label - np.min(label))/(np.max(img) - np.min(img))
 
 
         ##TODO: maybe padd with mean value of the image
