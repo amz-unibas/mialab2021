@@ -51,7 +51,7 @@ def train_fn(loader, model, optimizer, loss_fn, scaler, idx):
 
         # forward
         with torch.cuda.amp.autocast():
-            predictions = model(data)
+            predictions = model(data.float())
             loss = loss_fn(predictions, targets)
 
         # backward
