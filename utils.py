@@ -1,11 +1,13 @@
 import torch
 import torchvision
 from dataset import DataSet
+from evaldataset import EvalDataSet
 from torch.utils.data import DataLoader
 import numpy as np
+import nibabel as nib
 
 
-def save_checkpoint(state, filename="checkpoint.pth.tar"):
+def save_checkpoint(state, filename):
     print("=> Saving checkpoint")
     torch.save(state, filename)
 
@@ -25,8 +27,8 @@ def get_loaders(
         batch_size,
         train_transform,
         test_transform,
-        num_workers=4,
-        pin_memory=True,
+        num_workers,
+        pin_memory,
 ):
     train_ds = DataSet(
         img_path=train_dir,
@@ -63,7 +65,33 @@ def get_loaders(
     return train_loader, test_loader
 
 
-def check_accuracy(loader, model, writer, loss_fn, device="cuda:2"):
+def get_eval_loader(
+        eval_dir,
+        img_width,
+        img_height,
+        batch_size,
+        eval_transform,
+        num_workers,
+        pin_memory,
+):
+    eval_ds = EvalDataSet(
+        img_path=eval_dir,
+        img_width=img_width,
+        img_height=img_height,
+        transform=eval_transform,
+    )
+
+    eval_loader = DataLoader(
+        eval_ds,
+        batch_size=batch_size,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        shuffle=True,
+    )
+
+    return eval_loader
+
+def check_accuracy(loader, model, writer, device):
     dice_score = 0
     model.eval()
     #no gradients
@@ -74,7 +102,6 @@ def check_accuracy(loader, model, writer, loss_fn, device="cuda:2"):
             preds = torch.sigmoid(model(x.float()))
             # convert all values > 0.5 to 1
             preds = (preds > 0.5).float()
-            #TODO dice score for each image, not in total
             dice_score += calculate_dice_score(y, preds)
 
     print(f"Dice score: {dice_score / len(loader)}")
@@ -84,14 +111,35 @@ def check_accuracy(loader, model, writer, loss_fn, device="cuda:2"):
         targets = y.float().unsqueeze(1).to(device)
         preds = torch.sigmoid(model(x.float()))
         # tensorboard
-        ##TODO image back normalization (+min, /max)
         writer.add_images("input images", x.detach().cpu(), idx)
         writer.add_images("target labels", targets.detach().cpu(), idx)
         writer.add_images("estimated labels", preds.detach().cpu(), idx)
 
     model.train()
 
-##TODO check implementation, seems like torch.sum(y) == 0 and torch.sum(preds) == 0 is often the case?
+def evaluate(loader, model, writer, device):
+    model.eval()
+    #no gradients
+    for idx, (x) in enumerate(loader):
+        x = x.to(device)
+        with torch.no_grad():
+            preds = torch.sigmoid(model(x))
+            preds = (preds > 0.5).float()
+        # tensorboard
+        # writer.add_images("input images", x.detach().cpu(), idx)
+        # writer.add_images("estimated labels", preds.detach().cpu(), idx)
+        ##TODO: resize to original size if necessary
+
+        ##TODO: tensor to np array, circle detection, calculate thickness
+        preds_np = preds.numpy()
+
+        ##TODO: save as nifti
+        ni_preds = nib.Nifti1Image(preds_np)
+        nib.save(ni_preds, ('label_', loader.dataset.images[idx]))
+
+    model.train()
+
+##calculate DICE similarity
 def calculate_dice_score(y, preds):
     intersection = torch.sum(preds * y)
     if torch.sum(y) == 0 and torch.sum(preds) == 0:
@@ -99,7 +147,7 @@ def calculate_dice_score(y, preds):
     return 2 * intersection / (torch.sum(preds) + torch.sum(y))
 
 
-def save_predictions_as_imgs(loader, model, index, folder="saved_images/", device="cuda:2"):
+def save_predictions_as_imgs(loader, model, index, folder, device="cuda:2"):
     model.eval()
     for idx, (x, y) in enumerate(loader):
         x = x.to(device=device)
