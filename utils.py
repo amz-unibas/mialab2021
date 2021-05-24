@@ -91,10 +91,11 @@ def get_eval_loader(
 
     return eval_loader
 
+
 def check_accuracy(loader, model, writer, device):
     dice_score = 0
     model.eval()
-    #no gradients
+    # no gradients
     with torch.no_grad():
         for x, y in loader:
             x = x.to(device)
@@ -117,9 +118,10 @@ def check_accuracy(loader, model, writer, device):
 
     model.train()
 
+
 def evaluate(loader, model, writer, device):
     model.eval()
-    #no gradients
+    # no gradients
     for idx, (x) in enumerate(loader):
         x = x.to(device)
         with torch.no_grad():
@@ -139,6 +141,7 @@ def evaluate(loader, model, writer, device):
 
     model.train()
 
+
 ##calculate DICE similarity
 def calculate_dice_score(y, preds):
     intersection = torch.sum(preds * y)
@@ -147,7 +150,7 @@ def calculate_dice_score(y, preds):
     return 2 * intersection / (torch.sum(preds) + torch.sum(y))
 
 
-def save_predictions_as_imgs(loader, model, index, folder, device="cuda:2"):
+def save_predictions_as_imgs(loader, model, index, folder, device):
     model.eval()
     for idx, (x, y) in enumerate(loader):
         x = x.to(device=device)
