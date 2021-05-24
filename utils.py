@@ -130,7 +130,7 @@ def evaluate(loader, model, writer, device):
         # tensorboard
         # writer.add_images("input images", x.detach().cpu(), idx)
         # writer.add_images("estimated labels", preds.detach().cpu(), idx)
-
+        torchvision.utils.save_image(preds, f"pred_{loader.dataset.images[idx]}.png")
         ##TODO: circle detection, calculate thickness
 
         preds_np = preds.detach().cpu().numpy()
