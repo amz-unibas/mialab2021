@@ -125,19 +125,22 @@ def evaluate(loader, model, writer, device):
     for idx, (x) in enumerate(loader):
         x = x.to(device)
         with torch.no_grad():
-            preds = torch.sigmoid(model(x))
+            preds = torch.sigmoid(model(x.float()))
             preds = (preds > 0.5).float()
         # tensorboard
         # writer.add_images("input images", x.detach().cpu(), idx)
         # writer.add_images("estimated labels", preds.detach().cpu(), idx)
-        ##TODO: resize to original size if necessary
 
-        ##TODO: tensor to np array, circle detection, calculate thickness
-        preds_np = preds.numpy()
+        ##TODO: circle detection, calculate thickness
 
-        ##TODO: save as nifti
-        ni_preds = nib.Nifti1Image(preds_np)
-        nib.save(ni_preds, ('label_', loader.dataset.images[idx]))
+        preds_np = preds.detach().cpu().numpy()
+        ##TODO: remove padding, resize to original size if necessary
+
+        ##save as nifti
+        affine = np.diag([1, 2, 3, 1])
+        print("shape: ", preds_np.shape)
+        ni_preds = nib.Nifti1Image(preds_np, affine)
+        nib.save(ni_preds, "label-" + loader.dataset.images[idx])
 
     model.train()
 

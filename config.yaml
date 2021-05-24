@@ -2,7 +2,7 @@ model:
   save_name: "checkpoint.pth.tar"
   load_name: "checkpoint.pth.tar"
   load_model: TRUE
-  eval_mode: FALSE
+  eval_mode: TRUE
 
 
 training:
