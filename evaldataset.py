@@ -3,6 +3,7 @@ import nibabel as nib
 from torch.utils import data
 import numpy as np
 import albumentations as albu
+import matplotlib.pyplot as plt
 
 class EvalDataSet(data.Dataset):
     def __init__(self,
