@@ -55,6 +55,10 @@ class EvalDataSet(data.Dataset):
 
         # plt.imshow(img)
         # plt.show()
-        print("Shape img", pad_img.shape)
+        # print("Shape img", pad_img.shape)
+        # pad_img.numpy()
+        # pad_org = np.resize(pad_img, (3400, 3000, 1))
+        # imaage = pad_org[:self.widths[0], :self.heights[0], :]
+        # print("original shape: ", imaage.shape)
 
         return pad_img

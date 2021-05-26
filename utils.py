@@ -132,6 +132,7 @@ def evaluate(loader, model, writer, device, cfg):
         # tensorboard
         # writer.add_images("input images", x.detach().cpu(), idx)
         # writer.add_images("estimated labels", preds.detach().cpu(), idx)
+        print("index: ", idx)
         torchvision.utils.save_image(preds, f"pred_{loader.dataset.images[idx]}.png")
 
         ##post
@@ -143,7 +144,6 @@ def evaluate(loader, model, writer, device, cfg):
         preds_org = np.resize(preds_np, (cfg.images.pad_w, cfg.images.pad_h, 1))
         print("big: ", preds_org.shape)
 
-        #predicitions = np.zeros((EvalDataSet.widths[idx], EvalDataSet.heights[idx], 1))
         predicitions = preds_org[:EvalDataSet.widths[idx], :EvalDataSet.heights[idx], :]
         print("original shape: ", predicitions.shape)
 
