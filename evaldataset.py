@@ -15,9 +15,10 @@ class EvalDataSet(data.Dataset):
         self.img_height = img_height
         self.transform = transform
         self.images = os.listdir(img_path)
-        self.heights = []
-        self.widths = []
-        self.affines = []
+        self.heights = 0
+        self.widths = 0
+        self.affines = 0
+        self.header = 0
 
     def __len__(self):
         return len(self.images)
@@ -25,7 +26,8 @@ class EvalDataSet(data.Dataset):
     def __getitem__(self, index):
         img_path = os.path.join(self.img_path, self.images[index])
         img = nib.load(img_path)
-        self.affines.append(img.affine)
+        self.affines = img.affine
+        self.header = img.header
         img = img.get_data()
 
         if img.ndim > 3:
@@ -33,8 +35,8 @@ class EvalDataSet(data.Dataset):
             img = img[:, :, :, 0]
 
         ##save h,w information for later
-        self.heights.append(img.shape[0])
-        self.widths.append(img.shape[1])
+        self.heights = img.shape[0]
+        self.widths = img.shape[1]
 
         ##albu Normalization
         normalize_transform = albu.Compose(
@@ -53,4 +55,4 @@ class EvalDataSet(data.Dataset):
             augmentations = self.transform(image=pad_img)
             pad_img = augmentations["image"]
 
-        return pad_img, self.widths, self.heights, self.affines
+        return pad_img, self.widths, self.heights, self.affines, self.header

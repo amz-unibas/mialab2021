@@ -123,7 +123,7 @@ def check_accuracy(loader, model, writer, device):
 def evaluate(loader, model, writer, device, cfg):
     model.eval()
     # no gradients
-    for idx, (x, y, z, w) in enumerate(loader):
+    for idx, (x, y, z, w, v) in enumerate(loader):
         x = x.to(device)
         with torch.no_grad():
             preds = torch.sigmoid(model(x.float()))
@@ -136,22 +136,25 @@ def evaluate(loader, model, writer, device, cfg):
         torchvision.utils.save_image(preds, f"pred_{loader.dataset.images[idx]}.png")
 
         # ##tensor to numpy array
-        preds_np = preds.detach().cpu().numpy()
-        preds_np = preds_np[0,:,:,:]
+        pred_np = preds.detach().cpu().numpy()
+        preds_np = pred_np[0,:,:,:]
 
-        # adjust to WHC
+        # adjust to WHC, maybe HWC (1,2,0)
         trans_preds = preds_np.transpose(2, 1, 0)
 
-        ##TODO: resize, remove padding
+        ##resize, remove padding
         preds_resized = cv.resize(trans_preds, (cfg.images.pad_w, cfg.images.pad_h), interpolation=cv.INTER_LINEAR)
 
         predicitions = preds_resized[:y[idx], :z[idx]]
 
         ##save as nifti
         affine = w[idx]
+        header = v[idx]
         xform = np.eye(4)
-        ni_preds_1= nib.nifti1.Nifti1Image(predicitions, None)
-        nif_preds_2 = nib.nifti1.Nifti1Image(predicitions, xform)
+        ni_preds = nib.nifti1.Nifti1Image(predicitions, affine, header=header)
+        ni_preds_1= nib.nifti1.Nifti1Image(predicitions, None, header=header)
+        nif_preds_2 = nib.nifti1.Nifti1Image(predicitions, xform, header=header)
+        nib.save(ni_preds, "predictions/label-" + loader.dataset.images[idx])
         nib.save(ni_preds_1, "predictions/label1-" + loader.dataset.images[idx])
         nib.save(nif_preds_2, "predictions/label2-" + loader.dataset.images[idx])
 
