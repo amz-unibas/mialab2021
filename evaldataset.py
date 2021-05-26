@@ -4,7 +4,6 @@ from torch.utils import data
 import numpy as np
 import albumentations as albu
 
-
 class EvalDataSet(data.Dataset):
     def __init__(self,
                  img_path,
@@ -28,7 +27,6 @@ class EvalDataSet(data.Dataset):
         img = nib.load(img_path)
         self.affines.append(img.affine)
         img = img.get_data()
-
 
         if img.ndim > 3:
             ##check which image is the correct one since there are 2

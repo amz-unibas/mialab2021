@@ -5,7 +5,7 @@ from evaldataset import EvalDataSet
 from torch.utils.data import DataLoader
 import numpy as np
 import nibabel as nib
-import SimpleITK as sitk
+import matplotlib.pyplot as plt
 
 def save_checkpoint(state, filename):
     print("=> Saving checkpoint")
@@ -134,25 +134,31 @@ def evaluate(loader, model, writer, device, cfg):
         #save as png
         torchvision.utils.save_image(preds, f"pred_{loader.dataset.images[idx]}.png")
 
-        ##tensor to numpy array
+        # ##tensor to numpy array
         preds_np = preds.detach().cpu().numpy()
+        preds_np = preds_np[0,:,:,:]
+
+        # adjust to WHC
+        trans_preds = preds_np.transpose(2, 1, 0)
 
         ##Remove padding, do resizing
-        preds_org = np.resize(preds_np, (cfg.images.pad_w, cfg.images.pad_h, 1))
+        preds_org = np.resize(trans_preds, (cfg.images.pad_w, cfg.images.pad_h, 1))
+        plt.imshow(preds_org)
+        plt.show()
+
         predicitions = preds_org[:y[idx], :z[idx], :]
+        plt.imshow(predicitions)
+        plt.show()
 
         ##save as nifti, TODO: fix format
         affine = w[idx]
         xform = np.eye(4)
-        ni_preds = nib.Nifti1Image(preds_np, affine[0, :, :])
-        ni_preds_1= nib.nifti1.Nifti1Image(preds_np, None)
-        nif_preds_2 = nib.nifti1.Nifti1Image(preds_np, xform)
-        nib.save(ni_preds, "predictions/label-" + loader.dataset.images[idx])
+        #ni_preds = nib.Nifti1Image(trans_x, affine[0, :, :])
+        ni_preds_1= nib.nifti1.Nifti1Image(trans_preds, None)
+        nif_preds_2 = nib.nifti1.Nifti1Image(trans_preds, xform)
+        #nib.save(ni_preds, "predictions/label-" + loader.dataset.images[idx])
         nib.save(ni_preds_1, "predictions/label1-" + loader.dataset.images[idx])
         nib.save(nif_preds_2, "predictions/label2-" + loader.dataset.images[idx])
-        ##use other library
-        out = sitk.GetImageFromArray(preds_np)
-        sitk.WriteImage(out, 'simpleitk_save' + loader.dataset.images[idx])
 
     model.train()
 
