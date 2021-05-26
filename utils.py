@@ -5,6 +5,7 @@ from evaldataset import EvalDataSet
 from torch.utils.data import DataLoader
 import numpy as np
 import nibabel as nib
+import SimpleITK as sitk
 
 def save_checkpoint(state, filename):
     print("=> Saving checkpoint")
@@ -133,7 +134,7 @@ def evaluate(loader, model, writer, device, cfg):
         #save as png
         torchvision.utils.save_image(preds, f"pred_{loader.dataset.images[idx]}.png")
 
-        ##save as nifit image
+        ##tensor to numpy array
         preds_np = preds.detach().cpu().numpy()
 
         ##Remove padding, do resizing
@@ -142,13 +143,16 @@ def evaluate(loader, model, writer, device, cfg):
 
         ##save as nifti, TODO: fix format
         affine = w[idx]
+        xform = np.eye(4)
         ni_preds = nib.Nifti1Image(preds_np, affine[0, :, :])
-        xform = np.eye(4) * 2
         ni_preds_1= nib.nifti1.Nifti1Image(preds_np, None)
         nif_preds_2 = nib.nifti1.Nifti1Image(preds_np, xform)
         nib.save(ni_preds, "predictions/label-" + loader.dataset.images[idx])
         nib.save(ni_preds_1, "predictions/label1-" + loader.dataset.images[idx])
         nib.save(nif_preds_2, "predictions/label2-" + loader.dataset.images[idx])
+        ##use other library
+        out = sitk.GetImageFromArray(preds_np)
+        sitk.WriteImage(out, 'simpleitk_save' + loader.dataset.images[idx])
 
     model.train()
 
