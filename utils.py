@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 import nibabel as nib
 import matplotlib.pyplot as plt
+import cv2 as cv
 
 def save_checkpoint(state, filename):
     print("=> Saving checkpoint")
@@ -141,22 +142,16 @@ def evaluate(loader, model, writer, device, cfg):
         # adjust to WHC
         trans_preds = preds_np.transpose(2, 1, 0)
 
-        ##Remove padding, do resizing
-        preds_org = np.resize(trans_preds, (cfg.images.pad_w, cfg.images.pad_h, 1))
-        plt.imshow(preds_org)
-        plt.show()
+        ##TODO: resize, remove padding
+        preds_resized = cv.resize(trans_preds, (cfg.images.pad_w, cfg.images.pad_h), interpolation=cv.INTER_LINEAR)
 
-        predicitions = preds_org[:y[idx], :z[idx], :]
-        plt.imshow(predicitions)
-        plt.show()
+        predicitions = preds_resized[:y[idx], :z[idx]]
 
-        ##save as nifti, TODO: fix format
+        ##save as nifti
         affine = w[idx]
         xform = np.eye(4)
-        #ni_preds = nib.Nifti1Image(trans_x, affine[0, :, :])
-        ni_preds_1= nib.nifti1.Nifti1Image(trans_preds, None)
-        nif_preds_2 = nib.nifti1.Nifti1Image(trans_preds, xform)
-        #nib.save(ni_preds, "predictions/label-" + loader.dataset.images[idx])
+        ni_preds_1= nib.nifti1.Nifti1Image(predicitions, None)
+        nif_preds_2 = nib.nifti1.Nifti1Image(predicitions, xform)
         nib.save(ni_preds_1, "predictions/label1-" + loader.dataset.images[idx])
         nib.save(nif_preds_2, "predictions/label2-" + loader.dataset.images[idx])
 
