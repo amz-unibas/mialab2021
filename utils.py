@@ -7,7 +7,9 @@ import numpy as np
 import nibabel as nib
 import matplotlib.pyplot as plt
 import albumentations as albu
-
+from evaldataset import (
+heights, widths
+)
 
 def save_checkpoint(state, filename):
     print("=> Saving checkpoint")
@@ -144,7 +146,7 @@ def evaluate(loader, model, writer, device, cfg):
         preds_org = np.resize(preds_np, (cfg.images.pad_w, cfg.images.pad_h, 1))
         print("big: ", preds_org.shape)
 
-        predicitions = preds_org[:EvalDataSet.widths[idx], :EvalDataSet.heights[idx], :]
+        predicitions = preds_org[:loader.dataset.widths[idx], :loader.dataset.heights[idx], :]
         print("original shape: ", predicitions.shape)
 
         ##save as nifti, TODO: fix format
