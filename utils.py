@@ -121,7 +121,7 @@ def check_accuracy(loader, model, writer, device):
 def evaluate(loader, model, writer, device, cfg):
     model.eval()
     # no gradients
-    for idx, (x) in enumerate(loader):
+    for idx, (x, y, z) in enumerate(loader):
         x = x.to(device)
         with torch.no_grad():
             preds = torch.sigmoid(model(x.float()))
@@ -136,13 +136,13 @@ def evaluate(loader, model, writer, device, cfg):
         preds_np = preds.detach().cpu().numpy()
         ##TODO: circle detection, calculate thickness
 
-        ##TODO: remove padding, resize to original size if necessary
 
+        ##Remove padding, do resizing
         preds_org = np.resize(preds_np, (cfg.images.pad_w, cfg.images.pad_h, 1))
-        print("big: ", preds_org.shape)
+        #print("big: ", preds_org.shape)
 
-        predicitions = preds_org[:loader.dataset.widths[idx], :loader.dataset.heights[idx], :]
-        print("original shape: ", predicitions.shape)
+        predicitions = preds_org[:y[idx], :z[idx], :]
+        #print("original shape: ", predicitions.shape)
 
         ##save as nifti, TODO: fix format
         # affine = np.diag([1, 2, 3, 1])

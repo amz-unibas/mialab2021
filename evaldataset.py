@@ -6,8 +6,6 @@ import albumentations as albu
 
 
 class EvalDataSet(data.Dataset):
-    heights = []
-    widths = []
     def __init__(self,
                  img_path,
                  img_width, img_height,
@@ -18,6 +16,8 @@ class EvalDataSet(data.Dataset):
         self.img_height = img_height
         self.transform = transform
         self.images = os.listdir(img_path)
+        self.heights = []
+        self.widths = []
 
     def __len__(self):
         return len(self.images)
@@ -30,7 +30,6 @@ class EvalDataSet(data.Dataset):
         if img.ndim > 3:
             ##check which image is the correct one since there are 2
             img = img[:, :, :, 0]
-
 
         ##save h,w information for later
         self.heights.append(img.shape[0])
@@ -53,12 +52,4 @@ class EvalDataSet(data.Dataset):
             augmentations = self.transform(image=pad_img)
             pad_img = augmentations["image"]
 
-        # plt.imshow(img)
-        # plt.show()
-        # print("Shape img", pad_img.shape)
-        # pad_img.numpy()
-        # pad_org = np.resize(pad_img, (3400, 3000, 1))
-        # imaage = pad_org[:self.widths[0], :self.heights[0], :]
-        # print("original shape: ", imaage.shape)
-
-        return pad_img
+        return pad_img, self.widths, self.heights
