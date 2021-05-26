@@ -133,27 +133,22 @@ def evaluate(loader, model, writer, device, cfg):
         #save as png
         torchvision.utils.save_image(preds, f"pred_{loader.dataset.images[idx]}.png")
 
-        ##post
+        ##save as nifit image
         preds_np = preds.detach().cpu().numpy()
-        ##TODO: circle detection, calculate thickness
 
         ##Remove padding, do resizing
         preds_org = np.resize(preds_np, (cfg.images.pad_w, cfg.images.pad_h, 1))
-        #print("big: ", preds_org.shape)
-
         predicitions = preds_org[:y[idx], :z[idx], :]
-        #print("original shape: ", predicitions.shape)
 
         ##save as nifti, TODO: fix format
         affine = w[idx]
-        ni_preds = nib.Nifti1Image(predicitions, affine[0, :, :])
+        ni_preds = nib.Nifti1Image(preds_np, affine[0, :, :])
         xform = np.eye(4) * 2
-        ni_preds_1= nib.nifti1.Nifti1Image(predicitions, None)
-        nif_preds_2 = nib.nifti1.Nifti1Image(predicitions, xform)
+        ni_preds_1= nib.nifti1.Nifti1Image(preds_np, None)
+        nif_preds_2 = nib.nifti1.Nifti1Image(preds_np, xform)
         nib.save(ni_preds, "predictions/label-" + loader.dataset.images[idx])
         nib.save(ni_preds_1, "predictions/label1-" + loader.dataset.images[idx])
         nib.save(nif_preds_2, "predictions/label2-" + loader.dataset.images[idx])
-
 
     model.train()
 
