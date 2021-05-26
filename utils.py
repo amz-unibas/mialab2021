@@ -120,7 +120,7 @@ def check_accuracy(loader, model, writer, device):
     model.train()
 
 
-def evaluate(loader, model, writer, device, cfg):
+def evaluate(loader, model, writer, device, cfg, index):
     model.eval()
     # no gradients
     for idx, (x, y, z, w) in enumerate(loader):
@@ -131,9 +131,9 @@ def evaluate(loader, model, writer, device, cfg):
         # tensorboard
         # writer.add_images("input images", x.detach().cpu(), idx)
         # writer.add_images("estimated labels", preds.detach().cpu(), idx)
-        print("index: ", idx)
+        print("index: ", index)
         #save as png
-        torchvision.utils.save_image(preds, f"pred_{loader.dataset.images[idx]}.png")
+        torchvision.utils.save_image(preds, f"pred_{loader.dataset.images[index]}.png")
 
         # ##tensor to numpy array
         pred_np = preds.detach().cpu().numpy()
@@ -145,7 +145,7 @@ def evaluate(loader, model, writer, device, cfg):
         ##resize, remove padding
         preds_resized = cv.resize(trans_preds, (cfg.images.pad_w, cfg.images.pad_h), interpolation=cv.INTER_LINEAR)
 
-        predicitions = preds_resized[:y[idx], :z[idx]]
+        predicitions = preds_resized[:y[index], :z[index]]
 
         ##save as nifti
         affine = w[idx]
@@ -154,9 +154,9 @@ def evaluate(loader, model, writer, device, cfg):
         ni_preds = nib.nifti1.Nifti1Image(predicitions, affine)
         ni_preds_1= nib.nifti1.Nifti1Image(predicitions, None)
         nif_preds_2 = nib.nifti1.Nifti1Image(predicitions, xform)
-        nib.save(ni_preds, "predictions/label-" + loader.dataset.images[idx])
-        nib.save(ni_preds_1, "predictions/label1-" + loader.dataset.images[idx])
-        nib.save(nif_preds_2, "predictions/label2-" + loader.dataset.images[idx])
+        nib.save(ni_preds, "predictions/label-" + loader.dataset.images[index])
+        nib.save(ni_preds_1, "predictions/label1-" + loader.dataset.images[index])
+        nib.save(nif_preds_2, "predictions/label2-" + loader.dataset.images[index])
 
     model.train()
 

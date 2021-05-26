@@ -108,7 +108,6 @@ def main():
 
     eval_transforms = albu.Compose(
         [
-            # try to keep the original size of the inout images, otherwise uncomment
             albu.Resize(height=cfg.images.img_h, width=cfg.images.img_w),
             ToTensorV2(),
         ],
@@ -149,11 +148,12 @@ def main():
         load_checkpoint(torch.load(cfg.model.load_name), model)
 
     if cfg.model.eval_mode:
-        evaluate(eval_loader, model, writer, DEVICE, cfg)
-
-        writer.flush()
-        # use sleep to show the training
-        time.sleep(0.2)
+        for images in range(len(eval_loader.dataset.images)):
+            evaluate(eval_loader, model, writer, DEVICE, cfg, idx)
+            idx += 1
+            writer.flush()
+            # use sleep to show the training
+            time.sleep(0.2)
 
     else:
         scaler = torch.cuda.amp.GradScaler()
