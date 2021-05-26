@@ -5,11 +5,6 @@ from evaldataset import EvalDataSet
 from torch.utils.data import DataLoader
 import numpy as np
 import nibabel as nib
-import matplotlib.pyplot as plt
-import albumentations as albu
-from evaldataset import (
-heights, widths
-)
 
 def save_checkpoint(state, filename):
     print("=> Saving checkpoint")
