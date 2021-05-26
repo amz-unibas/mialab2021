@@ -5,6 +5,7 @@ from evaldataset import EvalDataSet
 from torch.utils.data import DataLoader
 import numpy as np
 import nibabel as nib
+import matplotlib.pyplot as plt
 
 
 def save_checkpoint(state, filename):
@@ -125,21 +126,28 @@ def evaluate(loader, model, writer, device):
     for idx, (x) in enumerate(loader):
         x = x.to(device)
         with torch.no_grad():
-            preds = torch.sigmoid(model(x.float()))
-            preds = (preds > 0.5).float()
+             preds = torch.sigmoid(model(x.float()))
+             preds = (preds > 0.5).float()
         # tensorboard
         # writer.add_images("input images", x.detach().cpu(), idx)
         # writer.add_images("estimated labels", preds.detach().cpu(), idx)
         torchvision.utils.save_image(preds, f"pred_{loader.dataset.images[idx]}.png")
+
+        ##post
+        preds_np = preds.detach().cpu().numpy()
         ##TODO: circle detection, calculate thickness
 
-        preds_np = preds.detach().cpu().numpy()
-        ##TODO: remove padding, resize to original size if necessary
 
-        ##save as nifti
-        affine = np.diag([1, 2, 3, 1])
-        print("shape: ", preds_np.shape)
-        ni_preds = nib.Nifti1Image(preds_np, affine)
+        ##TODO: remove padding, resize to original size if necessary
+        predicitions = np.zeros((EvalDataSet.widths[idx], EvalDataSet.heights[idx], 1))
+        predicitions[:, :, :] = preds_np
+        print("shape: ", predicitions.shape)
+
+
+        ##save as nifti, TODO: fix format
+        #affine = np.diag([1, 2, 3, 1])
+        affine = np.eye(4)
+        ni_preds = nib.Nifti1Image(predicitions, affine)
         nib.save(ni_preds, "label-" + loader.dataset.images[idx])
 
     model.train()

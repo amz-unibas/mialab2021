@@ -11,7 +11,6 @@ from torch.utils.tensorboard import SummaryWriter
 import time
 from omegaconf import OmegaConf
 
-
 from utils import (
     load_checkpoint,
     save_checkpoint,
@@ -19,7 +18,6 @@ from utils import (
     check_accuracy,
     save_predictions_as_imgs,
     evaluate, get_eval_loader)
-
 
 GPU_ID = 2
 DEVICE = "cuda:" + str(GPU_ID) if torch.cuda.is_available() else "cpu"
@@ -59,8 +57,8 @@ def train_fn(loader, model, optimizer, loss_fn, scaler, idx):
         # tensorboard
         writer.add_scalar('loss ', loss.item(), idx)
 
-def main():
 
+def main():
     ##config
     # get the cli commands
     cli_conf = OmegaConf.from_cli()
@@ -92,11 +90,11 @@ def main():
         [
             albu.Resize(height=cfg.images.img_h, width=cfg.images.img_w),
             albu.Rotate(limit=10, p=0.5),
-            #albu.HorizontalFlip(p=0.5),
+            # albu.HorizontalFlip(p=0.5),
             albu.VerticalFlip(p=0.5),
             albu.Blur(blur_limit=5, always_apply=False, p=0.5),
-            #TODO label is float64, should be float32 to work for the brightness/contrast
-            #albu.RandomBrightnessContrast(brightness_limit=0.1, contrast_limit=0.1, brightness_by_max=True, always_apply=False, p=0.5),
+            # TODO label is float64, should be float32 to work for the brightness/contrast
+            # albu.RandomBrightnessContrast(brightness_limit=0.1, contrast_limit=0.1, brightness_by_max=True, always_apply=False, p=0.5),
             ToTensorV2(),
         ],
     )
@@ -110,8 +108,8 @@ def main():
 
     eval_transforms = albu.Compose(
         [
-            #try to keep the original size of the inout images, otherwise uncomment
-            albu.Resize(height=cfg.images.img_h, width=cfg.images.img_w),
+            # try to keep the original size of the inout images, otherwise uncomment
+            #albu.Resize(height=cfg.images.img_h, width=cfg.images.img_w),
             ToTensorV2(),
         ],
     )
@@ -121,43 +119,44 @@ def main():
     loss_fn = nn.BCEWithLogitsLoss()
     optimizer = optim.Adam(model.parameters(), lr=cfg.training.learning_rate)
     idx = 0
-    scaler = torch.cuda.amp.GradScaler()
-    if cfg.model.load_model:
-        load_checkpoint(torch.load(cfg.model.load_name, map_location=torch.device('cpu')), model)
 
+    ##loaders
+    eval_loader = get_eval_loader(
+        EVAL_IMG_DIR,
+        cfg.images.pad_w,
+        cfg.images.pad_h,
+        cfg.training.batch_size,
+        eval_transforms,
+        cfg.training.num_workers,
+        PIN_MEMORY,
+    )
+
+    train_loader, test_loader = get_loaders(
+        TRAIN_IMG_DIR,
+        TRAIN_LABEL_DIR,
+        TEST_IMG_DIR,
+        TEST_LABEL_DIR,
+        cfg.images.pad_w,
+        cfg.images.pad_h,
+        cfg.training.batch_size,
+        train_transform,
+        test_transforms,
+        cfg.training.num_workers,
+        PIN_MEMORY,
+    )
+
+    if cfg.model.load_model:
+        load_checkpoint(torch.load(cfg.model.load_name), model)
 
     if cfg.model.eval_mode:
-        eval_loader = get_eval_loader(
-            EVAL_IMG_DIR,
-            cfg.images.pad_w,
-            cfg.images.pad_h,
-            cfg.training.batch_size,
-            eval_transforms,
-            cfg.training.num_workers,
-            PIN_MEMORY,
-        )
-        evaluate(eval_loader, model, writer, device=DEVICE)
+        evaluate(eval_loader, model, writer, DEVICE)
         writer.flush()
         # use sleep to show the training
         time.sleep(0.2)
 
-
     else:
-        ##loaders
-        train_loader, test_loader = get_loaders(
-            TRAIN_IMG_DIR,
-            TRAIN_LABEL_DIR,
-            TEST_IMG_DIR,
-            TEST_LABEL_DIR,
-            cfg.images.pad_w,
-            cfg.images.pad_h,
-            cfg.training.batch_size,
-            train_transform,
-            test_transforms,
-            cfg.training.num_workers,
-            PIN_MEMORY,
-        )
-        check_accuracy(test_loader, model, writer, device=DEVICE)
+        scaler = torch.cuda.amp.GradScaler()
+        check_accuracy(test_loader, model, writer, DEVICE)
 
         for epoch in range(cfg.training.num_epochs):
             train_fn(train_loader, model, optimizer, loss_fn, scaler, idx)
@@ -171,7 +170,7 @@ def main():
 
             if idx % 5 == 0:
                 # check accuracy
-                check_accuracy(test_loader, model, writer, device=DEVICE)
+                check_accuracy(test_loader, model, writer, DEVICE)
                 # print some examples to a folder
                 save_predictions_as_imgs(test_loader, model, index=idx, folder="saved_images/", device=DEVICE)
 
