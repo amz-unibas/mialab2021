@@ -18,6 +18,7 @@ class EvalDataSet(data.Dataset):
         self.images = os.listdir(img_path)
         self.heights = []
         self.widths = []
+        self.affines = []
 
     def __len__(self):
         return len(self.images)
@@ -25,7 +26,9 @@ class EvalDataSet(data.Dataset):
     def __getitem__(self, index):
         img_path = os.path.join(self.img_path, self.images[index])
         img = nib.load(img_path)
+        self.affines.append(img.affine)
         img = img.get_data()
+
 
         if img.ndim > 3:
             ##check which image is the correct one since there are 2
@@ -52,4 +55,4 @@ class EvalDataSet(data.Dataset):
             augmentations = self.transform(image=pad_img)
             pad_img = augmentations["image"]
 
-        return pad_img, self.widths, self.heights
+        return pad_img, self.widths, self.heights, self.affines
