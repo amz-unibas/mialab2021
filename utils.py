@@ -140,10 +140,10 @@ def evaluate(loader, model, writer, device, cfg):
 
         ##TODO: remove padding, resize to original size if necessary
 
-        preds_org = np.resize(preds_np, (cfg.images.pad_w, cfg.images.pad_w, 1))
+        preds_org = np.resize(preds_np, (cfg.images.pad_w, cfg.images.pad_h, 1))
         print("big: ", preds_org.shape)
 
-        predicitions = np.zeros((EvalDataSet.widths[idx], EvalDataSet.heights[idx], 1))
+        predicitions = np.zeros((EvalDataSet.widths[idx-1], EvalDataSet.heights[idx-1], 1))
         predicitions[:, :, :] = preds_org[:EvalDataSet.widths[idx], :EvalDataSet.heights[idx], :]
         print("original shape: ", predicitions.shape)
 
