@@ -145,7 +145,8 @@ def evaluate(loader, model, writer, device, cfg):
         #print("original shape: ", predicitions.shape)
 
         ##save as nifti, TODO: fix format
-        ni_preds = nib.Nifti1Image(predicitions, w)
+        affine = w[idx]
+        ni_preds = nib.Nifti1Image(predicitions, affine[0,:,:])
         nib.save(ni_preds, "predictions/label-" + loader.dataset.images[idx])
 
     model.train()
