@@ -130,12 +130,12 @@ def evaluate(loader, model, writer, device, cfg):
         # writer.add_images("input images", x.detach().cpu(), idx)
         # writer.add_images("estimated labels", preds.detach().cpu(), idx)
         print("index: ", idx)
+        #save as png
         torchvision.utils.save_image(preds, f"pred_{loader.dataset.images[idx]}.png")
 
         ##post
         preds_np = preds.detach().cpu().numpy()
         ##TODO: circle detection, calculate thickness
-
 
         ##Remove padding, do resizing
         preds_org = np.resize(preds_np, (cfg.images.pad_w, cfg.images.pad_h, 1))
@@ -146,8 +146,14 @@ def evaluate(loader, model, writer, device, cfg):
 
         ##save as nifti, TODO: fix format
         affine = w[idx]
-        ni_preds = nib.Nifti1Image(predicitions, affine[0,:,:])
+        ni_preds = nib.Nifti1Image(predicitions, affine[0, :, :])
+        xform = np.eye(4) * 2
+        ni_preds_1= nib.nifti1.Nifti1Image(predicitions, None)
+        nif_preds_2 = nib.nifti1.Nifti1Image(predicitions, xform)
         nib.save(ni_preds, "predictions/label-" + loader.dataset.images[idx])
+        nib.save(ni_preds_1, "predictions/label1-" + loader.dataset.images[idx])
+        nib.save(nif_preds_2, "predictions/label2-" + loader.dataset.images[idx])
+
 
     model.train()
 
