@@ -35,6 +35,9 @@ class EvalDataSet(data.Dataset):
             ##check which image is the correct one since there are 2
             img = img[:, :, :, 0]
 
+        # plt.imshow(img)
+        # plt.show()
+
         ##save h,w information for later
         self.heights = img.shape[0]
         self.widths = img.shape[1]

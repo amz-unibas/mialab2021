@@ -92,7 +92,6 @@ def get_eval_loader(
 
     return eval_loader
 
-
 def check_accuracy(loader, model, writer, device):
     dice_score = 0
     model.eval()
@@ -146,16 +145,19 @@ def evaluate(loader, model, writer, device, cfg, index):
         preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_LINEAR)
         predicitions = preds_resized[:z[index], :y[index]]
 
+        # plt.imshow(predicitions)
+        # plt.show()
+
         ##save as nifti
         affine = w[idx]
         #header = v[idx]
-        #xform = np.eye(4)
+        xform = np.eye(4)
         ni_preds = nib.nifti1.Nifti1Image(predicitions, affine)
-        # ni_preds_1= nib.nifti1.Nifti1Image(predicitions, None)
-        # nif_preds_2 = nib.nifti1.Nifti1Image(predicitions, xform)
+        ni_preds_1= nib.nifti1.Nifti1Image(predicitions, None)
+        nif_preds_2 = nib.nifti1.Nifti1Image(predicitions, xform)
         nib.save(ni_preds, "predictions/label-" + loader.dataset.images[index])
-        # nib.save(ni_preds_1, "predictions/label1-" + loader.dataset.images[index])
-        # nib.save(nif_preds_2, "predictions/label2-" + loader.dataset.images[index])
+        nib.save(ni_preds_1, "predictions/label1-" + loader.dataset.images[index])
+        nib.save(nif_preds_2, "predictions/label2-" + loader.dataset.images[index])
 
     model.train()
 
