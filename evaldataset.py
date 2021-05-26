@@ -26,8 +26,6 @@ class EvalDataSet(data.Dataset):
         img_path = os.path.join(self.img_path, self.images[index])
         img = nib.load(img_path)
         img = img.get_data()
-        img_affine = img.affine
-        print(img_affine)
 
         if img.ndim > 3:
             ##check which image is the correct one since there are 2

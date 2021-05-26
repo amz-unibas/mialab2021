@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 import nibabel as nib
 import matplotlib.pyplot as plt
+import albumentations as albu
 
 
 def save_checkpoint(state, filename):
@@ -120,14 +121,14 @@ def check_accuracy(loader, model, writer, device):
     model.train()
 
 
-def evaluate(loader, model, writer, device):
+def evaluate(loader, model, writer, device, cfg):
     model.eval()
     # no gradients
     for idx, (x) in enumerate(loader):
         x = x.to(device)
         with torch.no_grad():
-             preds = torch.sigmoid(model(x.float()))
-             preds = (preds > 0.5).float()
+            preds = torch.sigmoid(model(x.float()))
+            preds = (preds > 0.5).float()
         # tensorboard
         # writer.add_images("input images", x.detach().cpu(), idx)
         # writer.add_images("estimated labels", preds.detach().cpu(), idx)
@@ -137,15 +138,21 @@ def evaluate(loader, model, writer, device):
         preds_np = preds.detach().cpu().numpy()
         ##TODO: circle detection, calculate thickness
 
-
         ##TODO: remove padding, resize to original size if necessary
+        resize_transform = albu.Compose(
+            [
+                albu.Resize(height=cfg.images.pad_h, width=cfg.images.pad_w),
+            ]
+        )
+        pred_resize = resize_transform(image=preds_np)
+        pred_org = pred_resize["image"]
+
         predicitions = np.zeros((EvalDataSet.widths[idx], EvalDataSet.heights[idx], 1))
-        predicitions[:, :, :] = preds_np
+        predicitions[:, :, :] = pred_org[:EvalDataSet.widths[idx], :EvalDataSet.heights[idx], :]
         print("shape: ", predicitions.shape)
 
-
         ##save as nifti, TODO: fix format
-        #affine = np.diag([1, 2, 3, 1])
+        # affine = np.diag([1, 2, 3, 1])
         affine = np.eye(4)
         ni_preds = nib.Nifti1Image(predicitions, affine)
         nib.save(ni_preds, "label-" + loader.dataset.images[idx])
