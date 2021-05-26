@@ -139,17 +139,13 @@ def evaluate(loader, model, writer, device, cfg):
         ##TODO: circle detection, calculate thickness
 
         ##TODO: remove padding, resize to original size if necessary
-        resize_transform = albu.Compose(
-            [
-                albu.Resize(height=cfg.images.pad_h, width=cfg.images.pad_w),
-            ]
-        )
-        pred_resize = resize_transform(image=preds_np)
-        pred_org = pred_resize["image"]
+
+        preds_org = np.resize(preds_np, (cfg.images.pad_w, cfg.images.pad_w, 1))
+        print("big: ", preds_org.shape)
 
         predicitions = np.zeros((EvalDataSet.widths[idx], EvalDataSet.heights[idx], 1))
-        predicitions[:, :, :] = pred_org[:EvalDataSet.widths[idx], :EvalDataSet.heights[idx], :]
-        print("shape: ", predicitions.shape)
+        predicitions[:, :, :] = preds_org[:EvalDataSet.widths[idx], :EvalDataSet.heights[idx], :]
+        print("original shape: ", predicitions.shape)
 
         ##save as nifti, TODO: fix format
         # affine = np.diag([1, 2, 3, 1])
