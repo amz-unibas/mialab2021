@@ -119,47 +119,42 @@ def check_accuracy(loader, model, writer, device):
     model.train()
 
 
-def evaluate(loader, model, writer, device, cfg, index):
-    model.eval()
-    # no gradients
-    for idx, (x, y, z, w) in enumerate(loader):
-        x = x.to(device)
-        with torch.no_grad():
-            preds = torch.sigmoid(model(x.float()))
-            preds = (preds > 0.5).float()
-        # tensorboard
-        # writer.add_images("input images", x.detach().cpu(), idx)
-        # writer.add_images("estimated labels", preds.detach().cpu(), idx)
-        print("index: ", index)
-        #save as png
-        torchvision.utils.save_image(preds, f"pred_{loader.dataset.images[index]}.png")
+def evaluate(x, y, z, w, name, model, device, cfg):
+    x = x.to(device)
+    with torch.no_grad():
+        preds = torch.sigmoid(model(x.float()))
+        preds = (preds > 0.5).float()
+    #save as png
+    torchvision.utils.save_image(preds, f"pred-{name}.png")
 
-        # ##tensor to numpy array
-        pred_np = preds.detach().cpu().numpy()
-        preds_np = pred_np[0,:,:,:]
+    # ##tensor to numpy array
+    preds_np = preds.detach().cpu().numpy()
 
-        # adjust to WHC, maybe HWC (1,2,0)
-        trans_preds = preds_np.transpose(1, 2, 0)
+    # adjust to WHC, maybe HWC (1,2,0)
+    trans_preds = preds_np.transpose(1, 2, 0)
 
-        ##resize, remove padding
-        preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_LINEAR)
-        predicitions = preds_resized[:z[index], :y[index]]
+    ##resize, remove padding
+    preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_LINEAR)
+    predicitions = preds_resized[:z, :y]
 
-        # plt.imshow(predicitions)
-        # plt.show()
+    # plt.imshow(predicitions)
+    # plt.show()
 
-        ##save as nifti
-        affine = w[idx]
-        #header = v[idx]
-        xform = np.eye(4)
-        ni_preds = nib.nifti1.Nifti1Image(predicitions, affine)
-        ni_preds_1= nib.nifti1.Nifti1Image(predicitions, None)
-        nif_preds_2 = nib.nifti1.Nifti1Image(predicitions, xform)
-        nib.save(ni_preds, "predictions/label-" + loader.dataset.images[index])
-        nib.save(ni_preds_1, "predictions/label1-" + loader.dataset.images[index])
-        nib.save(nif_preds_2, "predictions/label2-" + loader.dataset.images[index])
+    #TODO BONUS
+    ##TODO: load images, from tensor to np.array
 
-    model.train()
+    ##TODO: detect circle on original image, save diameter
+
+    ##TODO: detect 4 objects on prediction image
+
+    #   calculate least distance between the 2 object pairs
+
+    #   calculate the max width of each object
+
+    ##save as nifti
+    affine = w
+    ni_preds = nib.nifti1.Nifti1Image(predicitions, affine)
+    nib.save(ni_preds, "predictions/label-" + name)
 
 
 ##calculate DICE similarity

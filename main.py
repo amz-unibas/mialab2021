@@ -73,27 +73,14 @@ def main():
     if len(cfg) == 0 and len(cli_conf) == 0:
         cfg = OmegaConf.load("config.yaml")
 
-    if TEST_BONUS:
-        print("testing circle detection and co.")
-        ##TODO: load images, from tensor to np.array
-
-        ##TODO: detect circle on original image, save diameter
-
-        ##TODO: detect 4 objects on prediction image
-
-        #   calculate least distance between the 2 object pairs
-
-        #   calculate the max width of each object
-
-
     ##model parameters
     model = UNET(in_channels=1, out_channels=1).to(DEVICE)
     loss_fn = nn.BCEWithLogitsLoss()
     optimizer = optim.Adam(model.parameters(), lr=cfg.training.learning_rate)
     idx = 0
 
-    if cfg.model.load_model:
-        load_checkpoint(torch.load(cfg.model.load_name), model)
+    # if cfg.model.load_model:
+    #     load_checkpoint(torch.load(cfg.model.load_name), model)
 
     if cfg.model.eval_mode:
         eval_transforms = albu.Compose(
@@ -111,10 +98,13 @@ def main():
             cfg.training.num_workers,
             PIN_MEMORY,
         )
-        evaluate(eval_loader, model, writer, DEVICE, cfg)
-        writer.flush()
-        # use sleep to show the training
-        time.sleep(0.2)
+        model.eval()
+        for image in range(len(eval_loader.dataset.images)):
+            x, y, z, w = eval_loader.dataset.__getitem__(image)
+            name = eval_loader.dataset.images[image]
+            evaluate(x, y, z, w, name, model, DEVICE, cfg)
+
+        model.train()
 
     else:
         ##transforms
@@ -122,7 +112,6 @@ def main():
             [
                 albu.Resize(height=cfg.images.img_h, width=cfg.images.img_w),
                 albu.Rotate(limit=10, p=0.5),
-                # albu.HorizontalFlip(p=0.5),
                 albu.VerticalFlip(p=0.5),
                 albu.Blur(blur_limit=5, always_apply=False, p=0.5),
                 # TODO label is float64, should be float32 to work for the brightness/contrast
