@@ -85,33 +85,6 @@ def main():
 
         #   calculate the max width of each object
 
-    ##transforms
-    train_transform = albu.Compose(
-        [
-            albu.Resize(height=cfg.images.img_h, width=cfg.images.img_w),
-            albu.Rotate(limit=10, p=0.5),
-            # albu.HorizontalFlip(p=0.5),
-            albu.VerticalFlip(p=0.5),
-            albu.Blur(blur_limit=5, always_apply=False, p=0.5),
-            # TODO label is float64, should be float32 to work for the brightness/contrast
-            # albu.RandomBrightnessContrast(brightness_limit=0.1, contrast_limit=0.1, brightness_by_max=True, always_apply=False, p=0.5),
-            ToTensorV2(),
-        ],
-    )
-
-    test_transforms = albu.Compose(
-        [
-            albu.Resize(height=cfg.images.img_h, width=cfg.images.img_w),
-            ToTensorV2(),
-        ],
-    )
-
-    eval_transforms = albu.Compose(
-        [
-            albu.Resize(height=cfg.images.img_h, width=cfg.images.img_w),
-            ToTensorV2(),
-        ],
-    )
 
     ##model parameters
     model = UNET(in_channels=1, out_channels=1).to(DEVICE)
@@ -119,43 +92,67 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=cfg.training.learning_rate)
     idx = 0
 
-    ##loaders
-    eval_loader = get_eval_loader(
-        EVAL_IMG_DIR,
-        cfg.images.pad_w,
-        cfg.images.pad_h,
-        cfg.training.batch_size,
-        eval_transforms,
-        cfg.training.num_workers,
-        PIN_MEMORY,
-    )
-
-    train_loader, test_loader = get_loaders(
-        TRAIN_IMG_DIR,
-        TRAIN_LABEL_DIR,
-        TEST_IMG_DIR,
-        TEST_LABEL_DIR,
-        cfg.images.pad_w,
-        cfg.images.pad_h,
-        cfg.training.batch_size,
-        train_transform,
-        test_transforms,
-        cfg.training.num_workers,
-        PIN_MEMORY,
-    )
-
     if cfg.model.load_model:
         load_checkpoint(torch.load(cfg.model.load_name), model)
 
     if cfg.model.eval_mode:
-        for images in range(len(eval_loader.dataset.images)):
-            evaluate(eval_loader, model, writer, DEVICE, cfg, idx)
-            idx += 1
-            writer.flush()
-            # use sleep to show the training
-            time.sleep(0.2)
+        eval_transforms = albu.Compose(
+            [
+                albu.Resize(height=cfg.images.img_h, width=cfg.images.img_w),
+                ToTensorV2(),
+            ],
+        )
+        eval_loader = get_eval_loader(
+            EVAL_IMG_DIR,
+            cfg.images.pad_w,
+            cfg.images.pad_h,
+            cfg.training.batch_size,
+            eval_transforms,
+            cfg.training.num_workers,
+            PIN_MEMORY,
+        )
+        evaluate(eval_loader, model, writer, DEVICE, cfg)
+        writer.flush()
+        # use sleep to show the training
+        time.sleep(0.2)
 
     else:
+        ##transforms
+        train_transform = albu.Compose(
+            [
+                albu.Resize(height=cfg.images.img_h, width=cfg.images.img_w),
+                albu.Rotate(limit=10, p=0.5),
+                # albu.HorizontalFlip(p=0.5),
+                albu.VerticalFlip(p=0.5),
+                albu.Blur(blur_limit=5, always_apply=False, p=0.5),
+                # TODO label is float64, should be float32 to work for the brightness/contrast
+                # albu.RandomBrightnessContrast(brightness_limit=0.1, contrast_limit=0.1, brightness_by_max=True, always_apply=False, p=0.5),
+                ToTensorV2(),
+            ],
+        )
+
+        test_transforms = albu.Compose(
+            [
+                albu.Resize(height=cfg.images.img_h, width=cfg.images.img_w),
+                ToTensorV2(),
+            ],
+        )
+
+        ##loaders
+        train_loader, test_loader = get_loaders(
+            TRAIN_IMG_DIR,
+            TRAIN_LABEL_DIR,
+            TEST_IMG_DIR,
+            TEST_LABEL_DIR,
+            cfg.images.pad_w,
+            cfg.images.pad_h,
+            cfg.training.batch_size,
+            train_transform,
+            test_transforms,
+            cfg.training.num_workers,
+            PIN_MEMORY,
+        )
+
         scaler = torch.cuda.amp.GradScaler()
         check_accuracy(test_loader, model, writer, DEVICE)
 
