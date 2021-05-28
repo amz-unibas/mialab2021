@@ -105,7 +105,7 @@ def check_accuracy(loader, model, writer, device):
             preds = (preds > 0.5).float()
             dice_score += calculate_dice_score(y, preds)
 
-    print(f"Dice score: {dice_score / len(loader)}")
+    print(f"Dice score: {dice_score /   len(loader)}")
 
     for idx, (x, y) in enumerate(loader):
         x = x.to(device)
@@ -118,50 +118,79 @@ def check_accuracy(loader, model, writer, device):
 
     model.train()
 
+def evaluate(loader, model, device, cfg):
+    model.eval()
+    # no gradients
+    for idx, (x, y, z, w) in enumerate(loader):
+        x = x.to(device)
+        with torch.no_grad():
+            preds = torch.sigmoid(model(x.float()))
+            preds = (preds > 0.5).float()
 
-def evaluate(x, y, z, w, name, model, device, cfg):
-    x = x.to(device)
-    with torch.no_grad():
-        preds = torch.sigmoid(model(x.float()))
-        preds = (preds > 0.5).float()
-    #save as png
-    torchvision.utils.save_image(preds, f"pred-{name}.png")
+        torchvision.utils.save_image(preds, "pred_all_images.png")
+        # tensor to numpy array
+        pred_np = preds.detach().cpu().numpy()
 
-    # ##tensor to numpy array
-    preds_np = preds.detach().cpu().numpy()
+        #save as png
+        for img in range(len(loader.dataset.images)):
+            print("index: ", img)
 
-    # adjust to WHC, maybe HWC (1,2,0)
-    trans_preds = preds_np.transpose(1, 2, 0)
+            pred = pred_np[img]
 
-    ##resize, remove padding
-    preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_LINEAR)
-    predicitions = preds_resized[:z, :y]
+            # adjust to WHC, maybe HWC (1,2,0)
+            trans_preds = pred.transpose(1, 2, 0)
 
-    # plt.imshow(predicitions)
-    # plt.show()
+            ##resize, remove padding
+            preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_LINEAR)
+            predicitions = preds_resized[:z[img], :y[img]]
 
-    #TODO BONUS
-    ##TODO: load images, from tensor to np.array
+            #save as nifti
+            affine = w[img]
+            ni_preds = nib.nifti1.Nifti1Image(predicitions, affine)
+            nib.save(ni_preds, "predictions/label-" + loader.dataset.images[img])
 
-    ##TODO: detect circle on original image, save diameter
 
-    ##TODO: detect 4 objects on prediction image
-
-    #   calculate least distance between the 2 object pairs
-
-    #   calculate the max width of each object
-
-    ##save as nifti
-    affine = w
-    ni_preds = nib.nifti1.Nifti1Image(predicitions, affine)
-    nib.save(ni_preds, "predictions/label-" + name)
+# def evaluate(x, y, z, w, name, model, device, cfg):
+#     x = x.to(device)
+#     with torch.no_grad():
+#         preds = torch.sigmoid(model(x.float()))
+#         preds = (preds > 0.5).float()
+#     #save as png
+#     torchvision.utils.save_image(preds, f"pred-{name}.png")
+#
+#     # ##tensor to numpy array
+#     preds_np = preds.detach().cpu().numpy()
+#
+#     # adjust to WHC, maybe HWC (1,2,0)
+#     trans_preds = preds_np.transpose(1, 2, 0)
+#
+#     ##resize, remove padding
+#     preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_LINEAR)
+#     predicitions = preds_resized[:z, :y]
+#
+#     # plt.imshow(predicitions)
+#     # plt.show()
+#
+#     #TODO BONUS
+#     ##TODO: load images, from tensor to np.array
+#
+#     ##TODO: detect circle on original image, save diameter
+#
+#     ##TODO: detect 4 objects on prediction image
+#
+#     #   calculate least distance between the 2 object pairs
+#
+#     #   calculate the max width of each object
+#
+#     ##save as nifti
+#     affine = w
+#     ni_preds = nib.nifti1.Nifti1Image(predicitions, affine)
+#     nib.save(ni_preds, "predictions/label-" + name)
 
 
 ##calculate DICE similarity
 def calculate_dice_score(y, preds):
     intersection = torch.sum(preds * y)
-    if torch.sum(y) == 0 and torch.sum(preds) == 0:
-        return 1
     return 2 * intersection / (torch.sum(preds) + torch.sum(y))
 
 

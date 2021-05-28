@@ -98,13 +98,14 @@ def main():
             cfg.training.num_workers,
             PIN_MEMORY,
         )
-        model.eval()
-        for image in range(len(eval_loader.dataset.images)):
-            x, y, z, w = eval_loader.dataset.__getitem__(image)
-            name = eval_loader.dataset.images[image]
-            evaluate(x, y, z, w, name, model, DEVICE, cfg)
-
-        model.train()
+        evaluate(eval_loader, model, DEVICE, cfg)
+        # model.eval()
+        # for image in range(len(eval_loader.dataset.images)):
+        #     x, y, z, w = eval_loader.dataset.__getitem__(image)
+        #     name = eval_loader.dataset.images[image]
+        #     evaluate(x, y, z, w, name, model, DEVICE, cfg)
+        #
+        # model.train()
 
     else:
         ##transforms
