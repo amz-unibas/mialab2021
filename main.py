@@ -79,8 +79,8 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=cfg.training.learning_rate)
     idx = 0
 
-    # if cfg.model.load_model:
-    #     load_checkpoint(torch.load(cfg.model.load_name), model)
+    if cfg.model.load_model:
+        load_checkpoint(torch.load(cfg.model.load_name), model)
 
     if cfg.model.eval_mode:
         eval_transforms = albu.Compose(
