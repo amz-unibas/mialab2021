@@ -147,7 +147,7 @@ def evaluate(loader, model, device, cfg):
             #save as nifti
             affine = w[img]
             ni_preds = nib.nifti1.Nifti1Image(predicitions, affine)
-            nib.save(ni_preds, "predictions/label-" + v)
+            nib.save(ni_preds, "predictions/label-" + v[img])
 
 
 # def evaluate(x, y, z, w, name, model, device, cfg):

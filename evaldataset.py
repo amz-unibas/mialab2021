@@ -61,6 +61,5 @@ class EvalDataSet(data.Dataset):
 
         img_split = img_path.split("/")
         img_name = img_split[-1]
-        print("ddd")
 
         return pad_img, self.widths, self.heights, self.affines, img_name
