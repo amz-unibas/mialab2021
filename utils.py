@@ -121,7 +121,7 @@ def check_accuracy(loader, model, writer, device):
 def evaluate(loader, model, device, cfg):
     model.eval()
     # no gradients
-    for idx, (x, y, z, w) in enumerate(loader):
+    for idx, (x, y, z, w, v) in enumerate(loader):
         x = x.to(device)
         with torch.no_grad():
             preds = torch.sigmoid(model(x.float()))
@@ -147,7 +147,7 @@ def evaluate(loader, model, device, cfg):
             #save as nifti
             affine = w[img]
             ni_preds = nib.nifti1.Nifti1Image(predicitions, affine)
-            nib.save(ni_preds, "predictions/label-" + loader.dataset.images[img])
+            nib.save(ni_preds, "predictions/label-" + v)
 
 
 # def evaluate(x, y, z, w, name, model, device, cfg):

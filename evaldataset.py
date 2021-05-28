@@ -59,4 +59,8 @@ class EvalDataSet(data.Dataset):
             augmentations = self.transform(image=pad_img)
             pad_img = augmentations["image"]
 
-        return pad_img, self.widths, self.heights, self.affines
+        img_split = img_path.split("/")
+        img_name = img_split[-1]
+        print("ddd")
+
+        return pad_img, self.widths, self.heights, self.affines, img_name
