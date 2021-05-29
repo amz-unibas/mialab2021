@@ -144,7 +144,7 @@ def main():
         )
 
         scaler = torch.cuda.amp.GradScaler()
-        check_accuracy(test_loader, model, writer, DEVICE)
+        #check_accuracy(test_loader, model, writer, DEVICE)
 
         for epoch in range(cfg.training.num_epochs):
             train_fn(train_loader, model, optimizer, loss_fn, scaler, idx)

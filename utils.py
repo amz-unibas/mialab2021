@@ -96,28 +96,21 @@ def check_accuracy(loader, model, writer, device):
     dice_score = 0
     model.eval()
     # no gradients
-    with torch.no_grad():
-        for x, y in loader:
-            x = x.to(device)
-            y = y.to(device)
-            preds = torch.sigmoid(model(x.float()))
-            # convert all values > 0.5 to 1
-            preds = (preds > 0.5).float()
-            dice_score += calculate_dice_score(y, preds)
-
-    print(f"Dice score: {dice_score /   len(loader)}")
-
     for idx, (x, y) in enumerate(loader):
         x = x.to(device)
+        y = y.to(device)
         targets = y.float().unsqueeze(1).to(device)
         with torch.no_grad():
             preds = torch.sigmoid(model(x.float()))
             preds = (preds > 0.5).float()
+
+        dice_score += calculate_dice_score(y, preds)
         # tensorboard
         writer.add_images("input images", x.detach().cpu(), idx)
         writer.add_images("target labels", targets.detach().cpu(), idx)
         writer.add_images("estimated labels", preds.detach().cpu(), idx)
 
+    print(f"Dice score: {dice_score /   len(loader)}")
     model.train()
 
 
