@@ -160,7 +160,7 @@ def main():
                 # check accuracy
                 check_accuracy(test_loader, model, writer, DEVICE)
                 # print some examples to a folder
-                save_predictions_as_imgs(test_loader, model, index=idx, folder="saved_images/", device=DEVICE)
+                #save_predictions_as_imgs(test_loader, model, index=idx, folder="saved_images/", device=DEVICE)
 
             writer.flush()
             # use sleep to show the training

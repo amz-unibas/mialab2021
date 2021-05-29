@@ -110,13 +110,35 @@ def check_accuracy(loader, model, writer, device):
     for idx, (x, y) in enumerate(loader):
         x = x.to(device)
         targets = y.float().unsqueeze(1).to(device)
-        preds = torch.sigmoid(model(x.float()))
+        with torch.no_grad():
+            preds = torch.sigmoid(model(x.float()))
+            preds = (preds > 0.5).float()
         # tensorboard
         writer.add_images("input images", x.detach().cpu(), idx)
         writer.add_images("target labels", targets.detach().cpu(), idx)
         writer.add_images("estimated labels", preds.detach().cpu(), idx)
 
     model.train()
+
+
+##calculate DICE similarity
+def calculate_dice_score(y, preds):
+    intersection = torch.sum(preds * y)
+    return 2 * intersection / (torch.sum(preds) + torch.sum(y))
+
+
+def save_predictions_as_imgs(loader, model, index, folder, device):
+    model.eval()
+    for idx, (x, y) in enumerate(loader):
+        x = x.to(device=device)
+        with torch.no_grad():
+            preds = torch.sigmoid(model(x.float()))
+            preds = (preds > 0.5).float()
+        torchvision.utils.save_image(preds, f"{folder}pred_{index}.png")
+        torchvision.utils.save_image(y.unsqueeze(1), f"{folder}{index}.png")
+
+    model.train()
+
 
 def evaluate(loader, model, device, cfg):
     model.eval()
@@ -141,7 +163,10 @@ def evaluate(loader, model, device, cfg):
             trans_preds = pred.transpose(1, 2, 0)
 
             ##resize, remove padding
-            preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_LINEAR)
+            #preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_LINEAR)
+            #TODO try interpolation methods
+            preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_CUBIC)
+            preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_NEAREST)
             predicitions = preds_resized[:z[img], :y[img]]
 
             #save as nifti
@@ -149,59 +174,11 @@ def evaluate(loader, model, device, cfg):
             ni_preds = nib.nifti1.Nifti1Image(predicitions, affine)
             nib.save(ni_preds, "predictions/label-" + v[img])
 
-
-# def evaluate(x, y, z, w, name, model, device, cfg):
-#     x = x.to(device)
-#     with torch.no_grad():
-#         preds = torch.sigmoid(model(x.float()))
-#         preds = (preds > 0.5).float()
-#     #save as png
-#     torchvision.utils.save_image(preds, f"pred-{name}.png")
-#
-#     # ##tensor to numpy array
-#     preds_np = preds.detach().cpu().numpy()
-#
-#     # adjust to WHC, maybe HWC (1,2,0)
-#     trans_preds = preds_np.transpose(1, 2, 0)
-#
-#     ##resize, remove padding
-#     preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_LINEAR)
-#     predicitions = preds_resized[:z, :y]
-#
-#     # plt.imshow(predicitions)
-#     # plt.show()
-#
-#     #TODO BONUS
-#     ##TODO: load images, from tensor to np.array
-#
-#     ##TODO: detect circle on original image, save diameter
-#
-#     ##TODO: detect 4 objects on prediction image
-#
-#     #   calculate least distance between the 2 object pairs
-#
-#     #   calculate the max width of each object
-#
-#     ##save as nifti
-#     affine = w
-#     ni_preds = nib.nifti1.Nifti1Image(predicitions, affine)
-#     nib.save(ni_preds, "predictions/label-" + name)
+    #     #TODO BONUS
+    #     ##TODO: load images, from tensor to np.array
+    #
+    #     ##TODO: detect circle on original image, save diameter
+    #
+    #     ##TODO: detect 4 objects on prediction image
 
 
-##calculate DICE similarity
-def calculate_dice_score(y, preds):
-    intersection = torch.sum(preds * y)
-    return 2 * intersection / (torch.sum(preds) + torch.sum(y))
-
-
-def save_predictions_as_imgs(loader, model, index, folder, device):
-    model.eval()
-    for idx, (x, y) in enumerate(loader):
-        x = x.to(device=device)
-        with torch.no_grad():
-            preds = torch.sigmoid(model(x.float()))
-            preds = (preds > 0.5).float()
-        torchvision.utils.save_image(preds, f"{folder}pred_{index}.png")
-        torchvision.utils.save_image(y.unsqueeze(1), f"{folder}{index}.png")
-
-    model.train()
