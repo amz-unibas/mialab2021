@@ -147,7 +147,7 @@ def evaluate(loader, model, device, cfg):
         pred_np = preds.detach().cpu().numpy()
 
         #save as png
-        for img in range(len(loader.dataset.images)/cfg.training.num_epochs):
+        for img in range(int(len(loader.dataset.images)/cfg.training.num_epochs)):
 
             print("shape: ", pred_np.shape)
             pred = pred_np[img]
