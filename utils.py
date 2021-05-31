@@ -148,24 +148,20 @@ def evaluate(loader, model, device, cfg):
 
         #save as png
         for img in range(len(loader.dataset.images)):
-            print("index: ", img)
 
+            print("shape: ", pred_np.shape)
             pred = pred_np[img]
 
             # adjust to WHC, maybe HWC (1,2,0)
             trans_preds = pred.transpose(1, 2, 0)
 
             ##resize, remove padding
-            #preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_LINEAR)
             #TODO try interpolation methods
-            preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_CUBIC)
+            #preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_LINEAR)
+            #preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_CUBIC)
             preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_NEAREST)
             predicitions = preds_resized[:z[img], :y[img]]
 
-            #save as nifti
-            affine = w[img]
-            ni_preds = nib.nifti1.Nifti1Image(predicitions, affine)
-            nib.save(ni_preds, "predictions/label-" + v[img])
 
     #     #TODO BONUS
     #     ##TODO: load images, from tensor to np.array
@@ -173,5 +169,10 @@ def evaluate(loader, model, device, cfg):
     #     ##TODO: detect circle on original image, save diameter
     #
     #     ##TODO: detect 4 objects on prediction image
+
+            # save as nifti
+            affine = w[img]
+            ni_preds = nib.nifti1.Nifti1Image(predicitions, affine)
+            nib.save(ni_preds, "predictions/label-" + v[img])
 
 
