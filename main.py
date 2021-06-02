@@ -17,7 +17,7 @@ from utils import (
     get_loaders,
     check_accuracy,
     save_predictions_as_imgs,
-    evaluate, get_eval_loader)
+    evaluate, get_eval_loader, edge_detection)
 
 GPU_ID = 2
 DEVICE = "cuda:" + str(GPU_ID) if torch.cuda.is_available() else "cpu"
@@ -100,6 +100,7 @@ def main():
         )
         for epoch in range(cfg.training.num_epochs):
             evaluate(eval_loader, model, DEVICE, cfg)
+            #edge_detection(eval_loader, DEVICE, cfg)
 
     else:
         ##transforms

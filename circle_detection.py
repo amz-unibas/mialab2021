@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import albumentations as albu
 
 # # Read image
-img = nib.load('data/eval/images/25111873.nii.gz')
+img = nib.load('data/eval/images/25277797.nii')
 image_data = img.get_fdata()
 #u8 = image_data.astype(np.uint8)
 h = image_data.shape[0]
@@ -24,7 +24,7 @@ img_norm = 255 * img_norm
 u8 = img_norm.astype(np.uint8)
 
 # #resize
-scale_factor = 5
+scale_factor = 1
 
 # Blur using 3 * 3 kernel.
 img_blurred = cv2.blur(u8, (3, 3))
@@ -40,12 +40,12 @@ img_t = resize_transform(image=img_blurred)
 img_res = img_t["image"]
 w = img_res.shape[1]
 
-half_img = img_res[:, int(w/2):w]
+half_img = img_res[:, int((w/5)*3):w]
 
 # Apply Hough transform on the blurred image.
 detected_circles = cv2.HoughCircles(half_img,
                                     cv2.HOUGH_GRADIENT, 1, 20, param1=50,
-                                    param2=30, minRadius=10, maxRadius=30)
+                                    param2=30, minRadius=50, maxRadius=150)
 
 if detected_circles is None:
     print("no circles found")

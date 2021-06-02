@@ -55,6 +55,10 @@ class EvalDataSet(data.Dataset):
         pad_img = np.zeros((self.img_width, self.img_height, 1))
         pad_img[:img.shape[0], :img.shape[1], :img.shape[2]] = img_norm
 
+        #for edge detection
+        # pad_img = np.zeros((self.img_width, self.img_height))
+        # pad_img[:img.shape[0], :img.shape[1]] = img_norm
+
         if self.transform is not None:
             augmentations = self.transform(image=pad_img)
             pad_img = augmentations["image"]
