@@ -49,7 +49,7 @@ class DataSet(data.Dataset):
         label_norm = img_d["mask"]
 
 
-        ##TOIMPROVE: maybe padd with mean value of the image
+        ##TO IMPROVE: adjust padding to "smarter" size
         ##add padding
         pad_img = np.zeros((self.img_width, self.img_height, 1))
         pad_img[:img.shape[0], :img.shape[1], :img.shape[2]] = img_norm

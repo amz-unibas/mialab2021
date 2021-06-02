@@ -1,4 +1,3 @@
-# Source https://www.youtube.com/watch?v=IHq1t7NxS8k
 
 import torch
 import albumentations as albu
@@ -110,7 +109,7 @@ def main():
                 albu.Rotate(limit=10, p=0.5),
                 albu.VerticalFlip(p=0.5),
                 albu.Blur(blur_limit=5, always_apply=False, p=0.5),
-                # TODO label is float64, should be float32 to work for the brightness/contrast
+                # datatype should be float32
                 # albu.RandomBrightnessContrast(brightness_limit=0.1, contrast_limit=0.1, brightness_by_max=True, always_apply=False, p=0.5),
                 ToTensorV2(),
             ],

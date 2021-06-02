@@ -7,6 +7,7 @@ import numpy as np
 import nibabel as nib
 import matplotlib.pyplot as plt
 import cv2 as cv
+from skimage.feature import canny
 
 def save_checkpoint(state, filename):
     print("=> Saving checkpoint")
@@ -156,7 +157,7 @@ def evaluate(loader, model, device, cfg):
             trans_preds = pred.transpose(1, 2, 0)
 
             ##resize, remove padding
-            #TODO try interpolation methods
+            #try interpolation methods
             #preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_LINEAR)
             #preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_CUBIC)
             preds_resized = cv.resize(trans_preds, (cfg.images.pad_h, cfg.images.pad_w), interpolation=cv.INTER_NEAREST)
@@ -164,7 +165,6 @@ def evaluate(loader, model, device, cfg):
 
 
     #     #TODO BONUS
-    #     ##TODO: load images, from tensor to np.array
     #
     #     ##TODO: detect circle on original image, save diameter
     #
@@ -174,5 +174,25 @@ def evaluate(loader, model, device, cfg):
             affine = w[img]
             ni_preds = nib.nifti1.Nifti1Image(predicitions, affine)
             nib.save(ni_preds, "predictions/label-" + v[img])
+
+def edge_detection(loader, device, cfg):
+    for idx, (x, y, z, w, v) in enumerate(loader):
+        x = x.to(device)
+        x = x.numpy()
+        #save as png
+        for img in range(int(len(loader.dataset.images)/cfg.training.num_epochs)):
+            label = x[img]
+
+            # adjust to WHC, maybe HWC (1,2,0)
+            label_t = label.transpose(1, 2, 0)
+
+            plt.imshow(label_t)
+            plt.show()
+            label_t = label_t[:, :, 0]
+
+            edges = canny(label_t / 1.)
+
+            plt.imshow(edges)
+            plt.show()
 
 
